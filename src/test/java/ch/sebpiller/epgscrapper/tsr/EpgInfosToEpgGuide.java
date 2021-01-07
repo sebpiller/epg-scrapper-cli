@@ -14,6 +14,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.util.List;
 
@@ -31,6 +32,7 @@ public class EpgInfosToEpgGuide {
         t.setOutputProperty(OutputKeys.INDENT, "yes");
         t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
         t.transform(new DOMSource(doc), new StreamResult(System.out));
+        t.transform(new DOMSource(doc), new StreamResult(new FileOutputStream("epg.xml")));
     }
 
     private Document buildDocumentFromEpgInfo(List<EpgInfo> infos) throws ParserConfigurationException {
@@ -85,7 +87,7 @@ public class EpgInfosToEpgGuide {
 
         int i = 0;
         for (EpgInfo info : infos) {
-            if (++i > 100) break;
+           // if (++i > 100) break;
             Element programme = doc.createElement("programme");
             programme.setAttribute("channel", info.getChannel().name());
             programme.setAttribute("start", info.getTimeStart().toString());

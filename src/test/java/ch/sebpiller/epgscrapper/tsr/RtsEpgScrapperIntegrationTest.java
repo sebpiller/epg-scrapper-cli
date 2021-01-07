@@ -3,6 +3,7 @@ package ch.sebpiller.epgscrapper.tsr;
 import ch.sebpiller.epgscrapper.Channel;
 import ch.sebpiller.epgscrapper.EpgInfo;
 import org.jsoup.Jsoup;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Ignore
 public class RtsEpgScrapperIntegrationTest {
     private static final Logger LOG = LoggerFactory.getLogger(RtsEpgScrapperIntegrationTest.class);
 
