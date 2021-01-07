@@ -1,0 +1,79 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>ch.sebpiller</groupId>
+    <artifactId>epg-scrapper</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <description>A project to scrape EPG (Electronic Program Guide) informations from various sources, to populate
+        TVHeadend EPG.
+    </description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
+
+        <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
+        <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
+
+        <timestamp>${maven.build.timestamp}</timestamp>
+        <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
+    </properties>
+
+    <developers>
+        <developer>
+            <id>sebpiller</id>
+            <name>Piller Sébastien</name>
+            <email>me@sebpiller.ch</email>
+            <organization>none</organization>
+            <timezone>GMT+1</timezone>
+            <url>https://github.com/sebpiller</url>
+        </developer>
+    </developers>
+
+    <scm>
+        <url>scm:git:http://git.home/spiller/epg-scrapper.git</url>
+        <connection>scm:git:http://git.home/spiller/epg-scrapper.git</connection>
+        <developerConnection>scm:git:http://git.home/spiller/epg-scrapper.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>spidybox-release</id>
+            <url>http://nexus.home/repository/maven-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>spidybox-snapshots</id>
+            <url>http://nexus.home/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.17.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.30</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.3</version>
+        </dependency>
+    </dependencies>
+</project>
