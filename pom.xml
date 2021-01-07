@@ -5,8 +5,8 @@
     <groupId>ch.sebpiller</groupId>
     <artifactId>epg-scrapper</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <description>A project to scrape EPG (Electronic Program Guide) informations from various sources, to populate
-        TVHeadend EPG.
+    <description>A project to scrape EPG (Electronic Program Guide) information from various sources, to populate
+        eg. TVHeadend EPG.
     </description>
 
     <properties>
@@ -75,5 +75,18 @@
             <artifactId>logback-classic</artifactId>
             <version>1.2.3</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.11</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.13.1</version>
+        </dependency>
+
+
     </dependencies>
 </project>
