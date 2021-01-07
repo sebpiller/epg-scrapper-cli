@@ -16,6 +16,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class EpgInfosToEpgGuide {
@@ -90,8 +92,8 @@ public class EpgInfosToEpgGuide {
            // if (++i > 100) break;
             Element programme = doc.createElement("programme");
             programme.setAttribute("channel", info.getChannel().name());
-            programme.setAttribute("start", info.getTimeStart().toString());
-            programme.setAttribute("stop", info.getTimeStop().toString());
+            programme.setAttribute("start", formatLocalDateTimeForEpg(info.getTimeStart()));
+            programme.setAttribute("stop", formatLocalDateTimeForEpg(info.getTimeStop()));
             root.appendChild(programme);
 
             Element title = doc.createElement("title");
@@ -115,4 +117,9 @@ public class EpgInfosToEpgGuide {
         return doc;
     }
 
+    private String formatLocalDateTimeForEpg(LocalDateTime ldt) {
+        // FIXME
+        // "20210107000500 +0100"
+        return DateTimeFormatter.ofPattern("yyyyMMddHHmmss").format(ldt)+" +0100";
+    }
 }
