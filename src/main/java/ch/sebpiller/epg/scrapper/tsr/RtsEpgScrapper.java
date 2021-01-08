@@ -26,12 +26,19 @@ import java.util.regex.Pattern;
 /**
  * Implementation of a scrapper that gets the data from the RTS website.
  */
+/*
+ * Implements a basic 'retry-on-timeout' algorithm: each now and then, RTS can not be reached and the Jsoup API dies
+ * with a SocketTimeoutException. In such cases, we wait 10 seconds (grace period where we do not send more
+ * requests to RTS) and repeat the operation. If we catch more than 10 timeouts during a scrape process, we die with the
+ * last timeout exception caught.
+ */
 public class RtsEpgScrapper implements EpgScrapper {
+    private static final Logger LOG = LoggerFactory.getLogger(RtsEpgScrapper.class);
+
     /**
      * The pattern of the text identifying an episode in RTS. Eg. "Saison 7 (12/22)".
      */
     static final String EPISODE_PATTERN = "^Saison (\\d+) \\((\\d+)/\\d+\\)$";
-    private static final Logger LOG = LoggerFactory.getLogger(RtsEpgScrapper.class);
     /**
      * The base url to scrape data from.
      */
@@ -49,6 +56,10 @@ public class RtsEpgScrapper implements EpgScrapper {
      */
     private static final int CHANNELS_PAGE_SIZE = 12;
     /**
+     * Number of timeouts to reach to abort the process.
+     */
+    private static final int MAX_TIMEOUT = 10;
+    /**
      * The format to parse date with time from RTS.
      */
     private static final DateTimeFormatter TIME_PARSER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
@@ -57,13 +68,12 @@ public class RtsEpgScrapper implements EpgScrapper {
      */
     private static final DateTimeFormatter DAYSTR_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     /**
-     * Remember the last epg info for all channels, so we can determine the stop time of a show.
+     * Remember the last epg info for all channels, so we can determine the stop time of that show.
      */
     private final Map<Channel, EpgInfo> lastEpg = Collections.synchronizedMap(new HashMap<>());
 
-    // count the number of timeout received during the scrape process. At each timeout, we wait 10s to give the remote
-    // site a chance to recover. Once reached a threshold, we abort the process with the original exception.
     private int timeoutCount;
+    private Set<String> temp = new HashSet<>();
 
     @Override
     public void scrapeEpg(Predicate<Channel> filterChannel, Predicate<EpgInfo> scrapeDetails, EpgInfoScrappedListener listener) {
@@ -165,7 +175,10 @@ public class RtsEpgScrapper implements EpgScrapper {
 
                 if (lastInfo != null) {
                     lastInfo.setTimeStop(start);
-                    listener.epgInfoScrapped(lastInfo);
+                    if (!listener.epgInfoScrapped(lastInfo)) {
+                        // asked to stop, we kill the process
+                        return;
+                    }
                 }
                 ////////////////////////////////////////////
 
@@ -250,7 +263,8 @@ public class RtsEpgScrapper implements EpgScrapper {
 
         Element cat = details.selectFirst("section.specifications h3 span");
         if (cat != null) {
-            info.setCategory(cat.text());
+            String text = resolveCategory(cat.text());
+            info.setCategory(text);
         }
 
         for (Element credit : details.select("section.credits div.credit")) {
@@ -282,11 +296,47 @@ public class RtsEpgScrapper implements EpgScrapper {
         }
     }
 
+    private String resolveCategory(String text) {
+        // FIXME improve mapping of category between rts and xmltv
+        switch (text.toLowerCase()) {
+            case "fiction":
+                return "Movie / Drama";
+            case "actualité":
+            case "actualite":
+                return "News / Current affairs";
+            case "divertissement":
+                return "Show / Games";
+            case "sport":
+                return "Sports";
+            case "jeunesse":
+                return "Children's / Youth";
+            case "musique, théâtre, danse":
+                return "Music";
+            case "magazine":
+                return "Art / Culture";
+            case "h":
+                return "Social / Political issues / Economics";
+            case "documentaire":
+                return "Education / Science / Factual topics";
+            case "x":
+                return "Leisure hobbies";
+            case "k":
+                return "Special characteristics";
+            default:
+                // TODO delete this block
+                if (!temp.contains(text)) {
+                    temp.add(text);
+                    System.out.println("************** " + text);
+                }
+                return text;
+        }
+    }
+
     private void handleTimeout(Exception re) {
         timeoutCount++;
-        LOG.warn("*** timeout occured: {}", timeoutCount);
+        LOG.warn("*** timeout occurred: {}", timeoutCount);
 
-        if (timeoutCount < 10) {
+        if (timeoutCount < MAX_TIMEOUT) {
             try {
                 Thread.sleep(10_000);
             } catch (InterruptedException e) {
@@ -296,4 +346,5 @@ public class RtsEpgScrapper implements EpgScrapper {
             throw new RuntimeException(re);
         }
     }
+
 }

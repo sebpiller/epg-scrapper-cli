@@ -8,8 +8,8 @@ import java.util.Objects;
  * Lists the supported TV channels with their known aliases.
  */
 public enum Channel {
-    RTS1("tsr1"),
-    RTS2("tsr2"),
+    RTS1("tsr1", "rts un"),
+    RTS2("tsr2", "rts deux"),
     TF1,
     TF1_SERIES_FILMS,
     FRANCE2("fr2"),
@@ -56,6 +56,12 @@ public enum Channel {
     BFM_TV("bfmtv"),
     CNEWS,
     LCP,
+
+    // OCS
+    OCS_MAX("ocs max"),
+    OCS_CHOC("ocs choc"),
+    OCS_CITY("ocs city"),
+    OCS_GEANTS("ocs geants"),
     ;
 
     private final String[] aliases;

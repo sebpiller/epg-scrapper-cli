@@ -4,5 +4,8 @@ import ch.sebpiller.epg.EpgInfo;
 
 @FunctionalInterface
 public interface EpgInfoScrappedListener {
-    void epgInfoScrapped(EpgInfo scrapped);
+    /**
+     * @return true to continue the scrape, false to stop the process.
+     */
+    boolean epgInfoScrapped(EpgInfo scrapped);
 }

@@ -40,6 +40,7 @@ public class RtsEpgScrapperTest {
             //if (e.getEpisode() != null)
             LOG.info("{}", e);
 
+            return true;
         });
 
         assertThat(i).isEqualTo(266);

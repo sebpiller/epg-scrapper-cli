@@ -1,5 +1,6 @@
 package ch.sebpiller.epg;
 
+import ch.sebpiller.epg.scrapper.ocs.OcsEpgScrapper;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -27,6 +28,12 @@ public class EpgInfosToEpgGuide {
         ObjectInputStream ois = new ObjectInputStream(getClass().getResourceAsStream("/all_epg_info.data"));
         List<EpgInfo> infos = (List<EpgInfo>) ois.readObject();
 
+        OcsEpgScrapper scrapper = new OcsEpgScrapper();
+        scrapper.scrapeEpg(x -> true, x -> true, i -> {
+            infos.add(i);
+            return true;
+        });
+
         System.out.println(infos.size());
 
         Document doc = buildDocumentFromEpgInfo(infos);
@@ -34,7 +41,7 @@ public class EpgInfosToEpgGuide {
         t.setOutputProperty(OutputKeys.INDENT, "yes");
         t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
         t.transform(new DOMSource(doc), new StreamResult(System.out));
-        t.transform(new DOMSource(doc), new StreamResult(new FileOutputStream("/home/spiller//tv/config/data/epg.xml")));
+        t.transform(new DOMSource(doc), new StreamResult(new FileOutputStream("/home/spiller/tv/config/data/epg.xml")));
     }
 
     private Document buildDocumentFromEpgInfo(List<EpgInfo> infos) throws ParserConfigurationException {
@@ -62,8 +69,8 @@ public class EpgInfosToEpgGuide {
             channel.appendChild(dn);
 
             Element icon = doc.createElement("icon");
-            dn.setTextContent(c.name());
-            channel.appendChild(dn);
+            icon.setTextContent(c.name());
+            channel.appendChild(icon);
 
             root.appendChild(channel);
         }
@@ -153,6 +160,6 @@ public class EpgInfosToEpgGuide {
 
     private String formatLocalDateTimeForEpg(ZonedDateTime ldt) {
         // "20210107000500+0100"
-        return DateTimeFormatter.ofPattern("yyyyMMddHHmmssZ").format(ldt);
+        return ldt==null ? null : DateTimeFormatter.ofPattern("yyyyMMddHHmmssZ").format(ldt);
     }
 }

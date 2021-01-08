@@ -143,11 +143,11 @@ public class EpgInfo implements Serializable {
         this.audience = audience;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
     public String getCategory() {
         return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 }
