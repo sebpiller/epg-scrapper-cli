@@ -19,6 +19,9 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Predicate;
 
 /**
@@ -35,8 +38,11 @@ public class OcsEpgScrapper implements EpgScrapper {
     // 20210116
     private static final String ROOT_URL = "https://grille.ocs.fr/white?embed=&";
 
+    private final Map<Channel, EpgInfo> lastEpgs = Collections.synchronizedMap(new HashMap<>());
+
     @Override
     public void scrapeEpg(Predicate<Channel> filterChannel, Predicate<EpgInfo> scrapeDetails, EpgInfoScrappedListener listener) {
+        lastEpgs.clear();
         LocalDate dayFetch = LocalDate.now();
         Document doc = null;
         boolean hasMoreData = true;
@@ -57,7 +63,7 @@ public class OcsEpgScrapper implements EpgScrapper {
     }
 
     void scrapeDocument(Document doc, Predicate<Channel> filterChannel, Predicate<EpgInfo> scrapeDetails, EpgInfoScrappedListener listener) {
-        //<input type="hidden" id="dateInitEpg" value="20210116"/>
+        // <input type="hidden" id="dateInitEpg" value="20210116"/>
         String attr = doc.getElementById("dateInitEpg").attr("value");
         LocalDate date = LocalDate.from(DAYSTR_FORMAT.parse(attr));
 
@@ -78,7 +84,6 @@ public class OcsEpgScrapper implements EpgScrapper {
             }
 
             Element li = grilleProgrammes.child(j);
-
             LocalTime lastTime = null;
             LocalDate ld = date;
 
@@ -93,16 +98,13 @@ public class OcsEpgScrapper implements EpgScrapper {
                 if (lastTime != null && time.isBefore(lastTime)) {
                     ld = ld.plusDays(1);
                 }
-
                 lastTime = time;
 
-                ZonedDateTime zdt = ZonedDateTime.of(ld,
-                        time,
-                        ZoneId.of("Europe/Zurich"));
+                ZonedDateTime zdt = ZonedDateTime.of(ld, time, ZoneId.of("Europe/Zurich"));
                 info.setTimeStart(zdt);
-                info.setTimeStop(zdt.plus(30, ChronoUnit.MINUTES));
                 info.setTitle(a.selectFirst(".program-title").text());
                 info.setCategory(resolveCategory(a.selectFirst(".program-subtitle span").text()));
+
                 //info.setSubtitle(subtitle);
                 //info.setEpisode(episode);
 
@@ -111,7 +113,17 @@ public class OcsEpgScrapper implements EpgScrapper {
                     //parseDetails(detailUriId, info);
                 }
 
-                listener.epgInfoScrapped(info);
+                boolean b = false;
+
+                lastEpgs.computeIfPresent(c, (channel, epgInfo) -> {
+                    epgInfo.setTimeStop(zdt);
+                    if (!listener.epgInfoScrapped(epgInfo)) {
+                        // FIXME support 'abort the loop'
+                    }
+                    return epgInfo;
+                });
+
+                lastEpgs.put(c, info);
             }
         }
     }
@@ -121,12 +133,15 @@ public class OcsEpgScrapper implements EpgScrapper {
         switch (text.toLowerCase()) {
             case "film":
             case "téléfilm":
+            case "film tv":
                 return "Movie / Drama";
             case "x":
                 return "News / Current affairs";
             case "série":
+            case "court-métrage":
                 return "Show / Games";
             case "sport":
+            case "sports":
                 return "Sports";
             case "xxxxx":
                 return "Children's / Youth";
@@ -136,7 +151,7 @@ public class OcsEpgScrapper implements EpgScrapper {
                 return "Art / Culture";
             case "h":
                 return "Social / Political issues / Economics";
-            case "yy":
+            case "documentaire":
                 return "Education / Science / Factual topics";
             case "magazine":
                 return "Leisure hobbies";

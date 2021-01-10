@@ -28,6 +28,6 @@ public class OcsEpgScrapperTest {
             return true;
         });
 
-        assertThat(i).isEqualTo(75);
+        assertThat(i).isEqualTo(71);
     }
 }
