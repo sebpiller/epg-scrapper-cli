@@ -18,6 +18,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -38,8 +39,10 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
     // https://www.programme-tv.net/programme/chaine/2021-01-14/programme-mangas-82.html
     private static final String ROOT_URL = "https://www.programme-tv.net/programme/chaine";
 
+    private static final Pattern EPISODE_PATTERN = Pattern.compile("Saison (\\d+) - Épisode (\\d+)");
+
     static {
-        Map<Channel, String> x = new HashMap<>();
+        Map<Channel, String> x = new EnumMap<>(Channel.class);
         x.put(Channel.MANGAS, "programme-mangas-82");
         x.put(Channel.THIRTEENTH_STREET, "programme-13eme-rue-26");
         // TODO
@@ -49,6 +52,16 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
         x.put(Channel.AB3, "programme-ab-3-138");
         x.put(Channel.NATGEO, "programme-national-geographic-98");
         x.put(Channel.NATGEOWILD, "programme-nat-geo-wild-207");
+        x.put(Channel.LCI, "programme-lci-la-chaine-info-78");
+        x.put(Channel.DISNEY_CHANNEL, "programme-disney-channel-57");
+        x.put(Channel.DISNEY_JUNIOR, "programme-disney-junior-166");
+        x.put(Channel.VOYAGE, "programme-voyage-134");
+        x.put(Channel.USHUAIA, "programme-ushuaia-tv-132");
+        x.put(Channel.PARAMOUNT, "programme-paramount-channel-226");
+        x.put(Channel.FRANCE24, "programme-france-24-142");
+        x.put(Channel.EQUIDIA, "programme-equidia-59");
+        x.put(Channel.CHASSE_PECHE, "programme-chasse-et-peche-42");
+        //x.put(Channel.RMCDECOUVERTE, "programme-rmc-decouverte-205");
 
         MAP = Collections.unmodifiableMap(x);
     }
@@ -57,23 +70,21 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
 
     @Override
     public void scrapeEpg(Predicate<Channel> filterChannel, Predicate<EpgInfo> scrapeDetails, EpgInfoScrappedListener listener) {
-        lastEpgs.clear();
+        this.lastEpgs.clear();
         Document doc;
 
-        for (Channel c : MAP.keySet()) {
+        for (Map.Entry<Channel, String> c : MAP.entrySet()) {
             boolean hasMoreData = true;
-
             LocalDate dayFetch = LocalDate.now();
-
-            if (!filterChannel.test(c)) {
+            if (!filterChannel.test(c.getKey())) {
                 continue;
             }
 
             do {
                 try {
                     // fetch data for current channel
-                    doc = Jsoup.connect(ROOT_URL + '/' + DAYSTR_FORMAT.format(dayFetch) + '/' + MAP.get(c) + ".html").get();
-                    scrapeDocument(doc, filterChannel, scrapeDetails, listener);
+                    doc = Jsoup.connect(ROOT_URL + '/' + DAYSTR_FORMAT.format(dayFetch) + '/' + c.getValue() + ".html").get();
+                    scrapeDocument(doc, scrapeDetails, listener);
                     dayFetch = dayFetch.plusDays(1); // tomorrow
                 } catch (HttpStatusException e) {
                     if (e.getStatusCode() == 404) {
@@ -85,15 +96,16 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
                     throw new RuntimeException(e);
                 }
 
-                LOG.trace("============================= {}", DAYSTR_FORMAT.format(dayFetch));
+                if (LOG.isTraceEnabled())
+                    LOG.trace("============================= {}", DAYSTR_FORMAT.format(dayFetch));
             } while (hasMoreData);
         }
     }
 
-    void scrapeDocument(Document doc, Predicate<Channel> filterChannel, Predicate<EpgInfo> scrapeDetails, EpgInfoScrappedListener listener) {
+    void scrapeDocument(Document doc, Predicate<EpgInfo> scrapeDetails, EpgInfoScrappedListener listener) {
         // https://www.programme-tv.net/programme/chaine/2021-01-14/programme-mangas-82.html
         String uri = doc.getElementsByAttributeValue("rel", "canonical").attr("href");
-        Matcher m = Pattern.compile("^.*/(\\d{4}\\-\\d{2}\\-\\d{2})/.*$").matcher(uri);
+        Matcher m = Pattern.compile("^.*/(\\d{4}-\\d{2}-\\d{2})/.*$").matcher(uri);
 
         if (!m.matches()) {
             throw new RuntimeException("can not find date of document");
@@ -189,7 +201,7 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
                 parseDetails(title.attr("href"), info);
             }
 
-            lastEpgs.computeIfPresent(c, (channel, epgInfo) -> {
+            this.lastEpgs.computeIfPresent(c, (channel, epgInfo) -> {
                 epgInfo.setTimeStop(zdt);
                 if (!listener.epgInfoScrapped(epgInfo)) {
                     // FIXME support 'abort the loop'
@@ -197,7 +209,7 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
                 return epgInfo;
             });
 
-            lastEpgs.put(c, info);
+            this.lastEpgs.put(c, info);
         }
     }
 
@@ -222,6 +234,26 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
 
     void parseDetails(Document doc, EpgInfo info) {
         info.setDescription(doc.select(".synopsis-text").text());
+
+        //programOverviewHeader-title
+        Element element = doc.selectFirst(".programOverviewHeader-title");
+        if (element == null) {
+//            System.out.println("======================");
+//            System.out.println(doc);
+//            System.out.println("======================");
+        } else {
+            String s = element.text();
+            Matcher m = EPISODE_PATTERN.matcher(s);
+            if (m.matches()) {
+                String episode = String.format("S%02dE%02d",
+                        Integer.parseInt(m.group(1)),
+                        Integer.parseInt(m.group(2))
+                );
+
+                info.setEpisode(episode);
+            }
+        }
+
     }
 
     private String resolveCategory(String text) {

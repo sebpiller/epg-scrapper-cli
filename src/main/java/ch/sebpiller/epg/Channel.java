@@ -70,6 +70,19 @@ public enum Channel {
     AB3("ab 3"),
     NATGEO("national geographic"),
     NATGEOWILD("natgeo wild", "nat geo wild"),
+    LCI("la chaine info", "la chaîne info", "LCI - La Chaîne Info"),
+    DISNEY_CHANNEL("disney channel"),
+    DISNEY_JUNIOR("disney junior"),
+    VOYAGE,
+    USHUAIA("ushuaia tv", "Ushuaïa TV"),
+    PARAMOUNT("paramount channel"),
+    FRANCE24("France 24"),
+    EQUIDIA,
+    CHASSE_PECHE("chasse et pêche", "chasse & pêche", "chasse et peche", "chasse & peche"),
+
+    // PlayTV.fr
+    ROUGETV("rouge-tv", "rouge tv"),
+
     ;
 
     private final String[] aliases;

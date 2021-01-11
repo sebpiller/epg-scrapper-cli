@@ -20,12 +20,12 @@ public class RtsEpgScrapperTest {
 
     @Before
     public void setUp() {
-        i = 0;
+        this.i = 0;
     }
 
     @Test
     public void testEpisodePattern() {
-        assertThat("Saison 7 (12/22)".matches(RtsEpgScrapper.EPISODE_PATTERN)).isTrue();
+        assertThat("Saison 7 (12/22)").matches(RtsEpgScrapper.EPISODE_PATTERN_STR);
     }
 
     @Test
@@ -36,14 +36,14 @@ public class RtsEpgScrapperTest {
 
         // do not scrape details
         scrapper.scrapeDocument(doc, c -> true, i -> false, e -> {
-            i++;
+            this.i++;
             //if (e.getEpisode() != null)
             LOG.info("{}", e);
 
             return true;
         });
 
-        assertThat(i).isEqualTo(266);
+        assertThat(this.i).isEqualTo(266);
     }
 
     @Test

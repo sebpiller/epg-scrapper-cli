@@ -39,10 +39,10 @@ public class OcsEpgScrapper implements EpgScrapper {
 
     @Override
     public void scrapeEpg(Predicate<Channel> filterChannel, Predicate<EpgInfo> scrapeDetails, EpgInfoScrappedListener listener) {
-        lastEpgs.clear();
+        this.lastEpgs.clear();
         LocalDate dayFetch = LocalDate.now();
-        Document doc = null;
-        boolean hasMoreData = true;
+        Document doc;
+        boolean hasMoreData;
         do {
             try {
                 doc = Jsoup.connect(ROOT_URL + "date=" + DAYSTR_FORMAT.format(dayFetch)).get();
@@ -51,7 +51,9 @@ public class OcsEpgScrapper implements EpgScrapper {
                 throw new RuntimeException(e);
             }
 
-            LOG.trace("============================= {}", DAYSTR_FORMAT.format(dayFetch));
+            if (LOG.isTraceEnabled())
+                LOG.trace("============================= {}", DAYSTR_FORMAT.format(dayFetch));
+
             if (hasMoreData) {
                 scrapeDocument(doc, filterChannel, scrapeDetails, listener);
                 dayFetch = dayFetch.plusDays(1); // tomorrow
@@ -103,14 +105,15 @@ public class OcsEpgScrapper implements EpgScrapper {
                 info.setCategory(resolveCategory(a.selectFirst(".program-subtitle span").text()));
 
                 // details are expensive to fetch. Some are filtered out by default.
-                String attr1 = null;
-                if (scrapeDetails.test(info) && !"#".equals(attr1 = a.attr("data-detaillink"))) {
+                if (scrapeDetails.test(info)) {
                     // data-detaillink="https://www.ocs.fr/programme/LAPROIEXXXXW0051426">
-
-                    parseDetails(attr1, info);
+                    String detailUri = a.attr("data-detaillink");
+                    if (!"#".equals(detailUri)) {
+                        parseDetails(detailUri, info);
+                    }
                 }
 
-                lastEpgs.computeIfPresent(c, (channel, epgInfo) -> {
+                this.lastEpgs.computeIfPresent(c, (channel, epgInfo) -> {
                     epgInfo.setTimeStop(zdt);
                     if (!listener.epgInfoScrapped(epgInfo)) {
                         // FIXME support 'abort the loop'
@@ -118,7 +121,7 @@ public class OcsEpgScrapper implements EpgScrapper {
                     return epgInfo;
                 });
 
-                lastEpgs.put(c, info);
+                this.lastEpgs.put(c, info);
             }
         }
     }
@@ -142,10 +145,8 @@ public class OcsEpgScrapper implements EpgScrapper {
     }
 
     void parseDetails(Document doc, EpgInfo info) {
-        //info.setSubtitle(subtitle);
         Element dis = doc.selectFirst(".presentation.display p");
         info.setDescription(dis == null ? null : dis.text());
-
 
         List<String> actors = new ArrayList<>();
         doc.select("div.infos div.casting ul li").forEach(element -> {
@@ -153,8 +154,6 @@ public class OcsEpgScrapper implements EpgScrapper {
             actors.add(text.substring(0, text.indexOf('(')).trim());
         });
         info.setActors(actors);
-
-        //info.setEpisode(episode);
     }
 
     private String resolveCategory(String text) {

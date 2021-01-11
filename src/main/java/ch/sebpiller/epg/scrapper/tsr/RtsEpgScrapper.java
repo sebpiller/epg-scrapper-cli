@@ -36,7 +36,8 @@ public class RtsEpgScrapper implements EpgScrapper {
     /**
      * The pattern of the text identifying an episode in RTS. Eg. "Saison 7 (12/22)".
      */
-    static final String EPISODE_PATTERN = "^Saison (\\d+) \\((\\d+)/\\d+\\)$";
+    static final String EPISODE_PATTERN_STR = "^Saison (\\d+) \\((\\d+)/\\d+\\)$";
+    private static final Pattern EPISODE_PATTERN = Pattern.compile(EPISODE_PATTERN_STR);
     private static final Logger LOG = LoggerFactory.getLogger(RtsEpgScrapper.class);
     /**
      * The base url to scrape data from.
@@ -72,12 +73,11 @@ public class RtsEpgScrapper implements EpgScrapper {
     private final Map<Channel, EpgInfo> lastEpg = Collections.synchronizedMap(new HashMap<>());
 
     private int timeoutCount;
-    private Set<String> temp = new HashSet<>();
 
     @Override
     public void scrapeEpg(Predicate<Channel> filterChannel, Predicate<EpgInfo> scrapeDetails, EpgInfoScrappedListener listener) {
-        timeoutCount = 0;
-        lastEpg.clear();
+        this.timeoutCount = 0;
+        this.lastEpg.clear();
 
         LocalDate dayFetch = LocalDate.now();
 
@@ -114,7 +114,8 @@ public class RtsEpgScrapper implements EpgScrapper {
                     }
                 } while (!ok);
 
-                LOG.trace("============================= {}", DAYSTR_FORMAT.format(dayFetch));
+                if (LOG.isTraceEnabled())
+                    LOG.trace("============================= {}", DAYSTR_FORMAT.format(dayFetch));
                 if (doc != null) {
                     scrapeDocument(doc, filterChannel, scrapeDetails, listener);
                 }
@@ -133,8 +134,6 @@ public class RtsEpgScrapper implements EpgScrapper {
         if (epg.size() != 1) {
             throw new IllegalArgumentException("invalid document: no unique 'section' with classes 'schedules' and 'day' !");
         }
-
-        Pattern patt = Pattern.compile(EPISODE_PATTERN);
 
         for (Element elChannel : epg.get(0).children()) {
             LOG.trace("-------");
@@ -170,7 +169,7 @@ public class RtsEpgScrapper implements EpgScrapper {
                 LOG.trace("{} {}:{} {}", channelName, start.getHour(), start.getMinute(), title);
 
                 // if we have a previous epg info for this channel, determine duration and notify the previous
-                EpgInfo lastInfo = lastEpg.get(channel);
+                EpgInfo lastInfo = this.lastEpg.get(channel);
 
                 if (lastInfo != null) {
                     lastInfo.setTimeStop(start);
@@ -190,7 +189,7 @@ public class RtsEpgScrapper implements EpgScrapper {
 
                     // If we are looking for an episode
                     if (episode == null) {
-                        Matcher m = patt.matcher(text);
+                        Matcher m = EPISODE_PATTERN.matcher(text);
 
                         // episode with complex pattern
                         if (m.matches()) {
@@ -226,7 +225,7 @@ public class RtsEpgScrapper implements EpgScrapper {
 
                 // we can not notify the recipient yet, we need the next entry on the same channel
                 // to be able to determine the duration of this entry.
-                lastEpg.put(channel, info);
+                this.lastEpg.put(channel, info);
             }
         }
     }
@@ -322,20 +321,15 @@ public class RtsEpgScrapper implements EpgScrapper {
             case "k":
                 return "Special characteristics";
             default:
-                // TODO delete this block
-                if (!temp.contains(text)) {
-                    temp.add(text);
-                    System.out.println("************** " + text);
-                }
                 return text;
         }
     }
 
     private void handleTimeout(Exception re) {
-        timeoutCount++;
-        LOG.warn("*** timeout occurred: {}", timeoutCount);
+        this.timeoutCount++;
+        LOG.warn("*** timeout occurred: {}", this.timeoutCount);
 
-        if (timeoutCount < MAX_TIMEOUT) {
+        if (this.timeoutCount < MAX_TIMEOUT) {
             try {
                 Thread.sleep(10_000);
             } catch (InterruptedException e) {

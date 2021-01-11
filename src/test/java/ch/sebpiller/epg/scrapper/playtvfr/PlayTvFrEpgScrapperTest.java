@@ -1,6 +1,8 @@
-package ch.sebpiller.epg.scrapper.programmetvnet;
+package ch.sebpiller.epg.scrapper.playtvfr;
 
+import ch.sebpiller.epg.Audience;
 import ch.sebpiller.epg.EpgInfo;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.Test;
@@ -12,15 +14,15 @@ import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ProgrammeTvNetEpgScrapperTest {
-    private static final Logger LOG = LoggerFactory.getLogger(ProgrammeTvNetEpgScrapperTest.class);
+public class PlayTvFrEpgScrapperTest {
+    private static final Logger LOG = LoggerFactory.getLogger(PlayTvFrEpgScrapperTest.class);
     private int i = 0;
 
     @Test
     public void testScrapeFromLocal() throws IOException {
-        Document doc = Jsoup.parse(getClass().getResourceAsStream("/sample_programmetvnet_mangas.html"), StandardCharsets.UTF_8.name(), "");
+        Document doc = Jsoup.parse(getClass().getResourceAsStream("/sample_playtvfr.html"), StandardCharsets.UTF_8.name(), "");
 
-        ProgrammeTvNetEpgScrapper scrapper = new ProgrammeTvNetEpgScrapper();
+        PlayTvFrEpgScrapper scrapper = new PlayTvFrEpgScrapper();
 
         // do not scrape details
         scrapper.scrapeDocument(doc, x -> false, e -> {
@@ -30,19 +32,19 @@ public class ProgrammeTvNetEpgScrapperTest {
             return true;
         });
 
-        assertThat(this.i).isEqualTo(56);
+        assertThat(this.i).isEqualTo(15);
     }
 
     @Test
     public void testScrapeDetailsFromLocal() throws IOException {
-        ProgrammeTvNetEpgScrapper scrapper = new ProgrammeTvNetEpgScrapper();
+        PlayTvFrEpgScrapper scrapper = new PlayTvFrEpgScrapper();
         EpgInfo info;
 
-        Document doc = Jsoup.parse(getClass().getResourceAsStream("/sample_details_6_programmetvnet.html"), StandardCharsets.UTF_8.name(), "");
+        Document doc = Jsoup.parse(getClass().getResourceAsStream("/sample_details_8_playtvfr_rougetv.html"), StandardCharsets.UTF_8.name(), "");
         scrapper.parseDetails(doc, info = new EpgInfo());
         LOG.info("{}", info);
         //assertThat(info.getCategory()).isNotNull();
-        assertThat(info.getDescription()).isNotNull();
+        assertThat(info.getAudience()).isEqualTo(Audience.EIGHTEEN);
     }
 
 }

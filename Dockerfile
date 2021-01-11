@@ -1,0 +1,19 @@
+FROM debian:buster
+LABEL arch="armhf|armv7|aarch64|amd64|i386"
+ENV DEBIAN_FRONTEND=noninteractive
+
+WORKDIR /tmp
+
+RUN \
+    { printf "deb http://nexus.home/repository/debian_buster/ buster main\n"; printf "deb http://nexus.home/repository/debian-security_buster-updates/ buster/updates main\n"; printf "deb http://nexus.home/repository/debian_buster-updates/ buster-updates main\n\n"; } > /etc/apt/sources.list
+
+RUN \
+    apt-get update -y && \
+    apt-get install -y --no-install-recommends --no-install-suggests \
+      openjdk-11-jdk-headless && \
+
+    rm -rf /var/lib/apt/lists/*
+
+COPY target/epg-scrapper-*-jar-with-dependencies.jar /epg-scrapper-latest.jar
+
+CMD [ "/bin/sh", "-c", "java -jar /epg-scrapper-latest.jar -o /data/epg.xml" ]
