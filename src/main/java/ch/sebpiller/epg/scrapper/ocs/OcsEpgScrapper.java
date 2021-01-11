@@ -5,6 +5,7 @@ import ch.sebpiller.epg.EpgInfo;
 import ch.sebpiller.epg.scrapper.EpgInfoScrappedListener;
 import ch.sebpiller.epg.scrapper.EpgScrapper;
 import org.apache.commons.lang3.StringUtils;
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -17,11 +18,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 
 /**
@@ -105,15 +102,13 @@ public class OcsEpgScrapper implements EpgScrapper {
                 info.setTitle(a.selectFirst(".program-title").text());
                 info.setCategory(resolveCategory(a.selectFirst(".program-subtitle span").text()));
 
-                //info.setSubtitle(subtitle);
-                //info.setEpisode(episode);
-
                 // details are expensive to fetch. Some are filtered out by default.
-                if (scrapeDetails.test(info)) {
-                    //parseDetails(detailUriId, info);
-                }
+                String attr1 = null;
+                if (scrapeDetails.test(info) && !"#".equals(attr1 = a.attr("data-detaillink"))) {
+                    // data-detaillink="https://www.ocs.fr/programme/LAPROIEXXXXW0051426">
 
-                boolean b = false;
+                    parseDetails(attr1, info);
+                }
 
                 lastEpgs.computeIfPresent(c, (channel, epgInfo) -> {
                     epgInfo.setTimeStop(zdt);
@@ -126,6 +121,40 @@ public class OcsEpgScrapper implements EpgScrapper {
                 lastEpgs.put(c, info);
             }
         }
+    }
+
+    private void parseDetails(String uri, EpgInfo info) {
+        try {
+            parseDetails(Jsoup.connect(uri).get(), info);
+        } catch (HttpStatusException e) {
+            // ignore 403 errors
+            if (e.getStatusCode() == 403) {
+                return;
+            } else if (e.getStatusCode() == 404) {
+                LOG.warn("not found {}", uri, e);
+                return;
+            }
+
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    void parseDetails(Document doc, EpgInfo info) {
+        //info.setSubtitle(subtitle);
+        Element dis = doc.selectFirst(".presentation.display p");
+        info.setDescription(dis == null ? null : dis.text());
+
+
+        List<String> actors = new ArrayList<>();
+        doc.select("div.infos div.casting ul li").forEach(element -> {
+            String text = element.text();
+            actors.add(text.substring(0, text.indexOf('(')).trim());
+        });
+        info.setActors(actors);
+
+        //info.setEpisode(episode);
     }
 
     private String resolveCategory(String text) {

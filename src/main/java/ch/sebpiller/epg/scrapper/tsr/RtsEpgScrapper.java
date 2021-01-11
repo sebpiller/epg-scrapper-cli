@@ -33,12 +33,11 @@ import java.util.regex.Pattern;
  * last timeout exception caught.
  */
 public class RtsEpgScrapper implements EpgScrapper {
-    private static final Logger LOG = LoggerFactory.getLogger(RtsEpgScrapper.class);
-
     /**
      * The pattern of the text identifying an episode in RTS. Eg. "Saison 7 (12/22)".
      */
     static final String EPISODE_PATTERN = "^Saison (\\d+) \\((\\d+)/\\d+\\)$";
+    private static final Logger LOG = LoggerFactory.getLogger(RtsEpgScrapper.class);
     /**
      * The base url to scrape data from.
      */

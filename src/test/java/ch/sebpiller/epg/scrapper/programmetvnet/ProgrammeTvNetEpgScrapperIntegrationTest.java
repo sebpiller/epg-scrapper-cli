@@ -1,4 +1,4 @@
-package ch.sebpiller.epg.scrapper.ocs;
+package ch.sebpiller.epg.scrapper.programmetvnet;
 
 import ch.sebpiller.epg.EpgInfo;
 import org.junit.Test;
@@ -13,16 +13,15 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OcsEpgScrapperIntegrationTest {
-    private static final Logger LOG = LoggerFactory.getLogger(OcsEpgScrapperIntegrationTest.class);
+public class ProgrammeTvNetEpgScrapperIntegrationTest {
+    private static final Logger LOG = LoggerFactory.getLogger(ProgrammeTvNetEpgScrapperIntegrationTest.class);
 
     @Test
-    public void testScrapeFromOcs() throws IOException {
+    public void testScrapeFromProgrammeTvNet() throws IOException {
         List<EpgInfo> allInfos = new ArrayList<>(25_000);
-        final ZonedDateTime inAWeek = ZonedDateTime.now().plus(7, ChronoUnit.DAYS);
 
         long start = System.currentTimeMillis();
-        OcsEpgScrapper scrapper = new OcsEpgScrapper();
+        ProgrammeTvNetEpgScrapper scrapper = new ProgrammeTvNetEpgScrapper();
         scrapper.scrapeEpg(c -> true, i -> true, e -> {
             allInfos.add(e);
 
@@ -30,12 +29,12 @@ public class OcsEpgScrapperIntegrationTest {
                 LOG.info("found {} in {}s", allInfos.size(), (System.currentTimeMillis() - start) / 1_000);
             }
 
-            return e.getTimeStart().isBefore(inAWeek);
+            return true;
         });
 
         allInfos.forEach(System.out::println);
 
-        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("all_ocs_epg_info.data"));
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("all_programmetvnet_epg_info.data"));
         oos.writeObject(allInfos);
         oos.close();
     }

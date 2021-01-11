@@ -11,7 +11,7 @@ public enum Channel {
     RTS1("tsr1", "rts un"),
     RTS2("tsr2", "rts deux"),
     TF1,
-    TF1_SERIES_FILMS,
+    TF1_SERIES_FILMS("tf1 séries films"),
     FRANCE2("fr2"),
     FRANCE3("fr3"),
     FRANCE4("fr4"),
@@ -27,7 +27,7 @@ public enum Channel {
     RTL9,
     TFX,
     NRJ12,
-    AB1,
+    AB1("ab 1"),
     CSTAR,
     CHERIE25,
     NUMERO23,
@@ -62,6 +62,14 @@ public enum Channel {
     OCS_CHOC("ocs choc"),
     OCS_CITY("ocs city"),
     OCS_GEANTS("ocs geants"),
+
+    // ProgrammeTV net
+    MANGAS,
+    THIRTEENTH_STREET("13eme rue", "13e rue", "13th rue"),
+    SYFY,
+    AB3("ab 3"),
+    NATGEO("national geographic"),
+    NATGEOWILD("natgeo wild", "nat geo wild"),
     ;
 
     private final String[] aliases;

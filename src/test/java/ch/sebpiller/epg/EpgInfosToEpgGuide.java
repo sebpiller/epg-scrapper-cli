@@ -1,6 +1,5 @@
 package ch.sebpiller.epg;
 
-import ch.sebpiller.epg.scrapper.ocs.OcsEpgScrapper;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -20,21 +19,25 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-@Ignore
 public class EpgInfosToEpgGuide {
 
     @Test
     public void test() throws Exception {
         ObjectInputStream ois = new ObjectInputStream(getClass().getResourceAsStream("/all_epg_info.data"));
         List<EpgInfo> infos = (List<EpgInfo>) ois.readObject();
+        ois.close();
 
-        OcsEpgScrapper scrapper = new OcsEpgScrapper();
-        scrapper.scrapeEpg(x -> true, x -> true, i -> {
-            infos.add(i);
-            return true;
-        });
+        ois = new ObjectInputStream(getClass().getResourceAsStream("/all_ocs_epg_info.data"));
+        List<EpgInfo> infos2 = (List<EpgInfo>) ois.readObject();
+        ois.close();
 
-        System.out.println(infos.size());
+        infos.addAll(infos2);
+
+        ois = new ObjectInputStream(getClass().getResourceAsStream("/all_programmetvnet_epg_info.data"));
+        List<EpgInfo> infos3 = (List<EpgInfo>) ois.readObject();
+        ois.close();
+
+        infos.addAll(infos3);
 
         Document doc = buildDocumentFromEpgInfo(infos);
         Transformer t = TransformerFactory.newInstance().newTransformer();
@@ -160,6 +163,6 @@ public class EpgInfosToEpgGuide {
 
     private String formatLocalDateTimeForEpg(ZonedDateTime ldt) {
         // "20210107000500+0100"
-        return ldt==null ? null : DateTimeFormatter.ofPattern("yyyyMMddHHmmssZ").format(ldt);
+        return ldt == null ? null : DateTimeFormatter.ofPattern("yyyyMMddHHmmssZ").format(ldt);
     }
 }
