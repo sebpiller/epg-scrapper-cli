@@ -68,7 +68,7 @@ public class PlayTvFrEpgScrapper implements EpgScrapper {
                 try {
                     // fetch data for current channel
                     doc = Jsoup.connect(ROOT_URL + '/' + c.getValue() + '/' + DAYSTR_FORMAT.format(dayFetch) + '/').get();
-                    System.out.println(doc);
+                    //System.out.println(doc);
 
                     scrapeDocument(doc, scrapeDetails, listener);
                     dayFetch = dayFetch.plusDays(1); // tomorrow

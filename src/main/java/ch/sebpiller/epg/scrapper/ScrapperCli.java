@@ -41,9 +41,7 @@ import java.util.concurrent.Callable;
         description = "Fetch data from multiple sources to populate an EPG.",
         sortOptions = false,
         versionProvider = ScrapperCli.VersionProvider.class,
-        header = {
-                ""
-        }
+        header = {"EPG Scrapper"}
 )
 public class ScrapperCli implements Callable<Integer> {
     public static final String ARTIFACT_ID = "epg-scrapper";
@@ -95,7 +93,8 @@ public class ScrapperCli implements Callable<Integer> {
     @Option(
             names = {"-o", "--output"},
             description = "The file to produce.",
-            arity = "0"
+            arity = "1",
+            required = true
     )
     private String cliParamOutput;
 
@@ -174,7 +173,7 @@ public class ScrapperCli implements Callable<Integer> {
             throw new AssertionError("java xml configuration is invalid: " + e, e);
         }
 
-        t.setOutputProperty(OutputKeys.INDENT, "yes");
+        t.setOutputProperty(OutputKeys.INDENT, "no");
         t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 
         try (OutputStream os = new FileOutputStream(this.cliParamOutput)) {

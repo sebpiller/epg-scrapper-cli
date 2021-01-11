@@ -151,7 +151,14 @@ public class OcsEpgScrapper implements EpgScrapper {
         List<String> actors = new ArrayList<>();
         doc.select("div.infos div.casting ul li").forEach(element -> {
             String text = element.text();
-            actors.add(text.substring(0, text.indexOf('(')).trim());
+
+            if (StringUtils.isNotBlank(text)) {
+                if (text.indexOf('(') >= 0) {
+                    actors.add(text.substring(0, text.indexOf('(')).trim());
+                } else {
+                    actors.add(text);
+                }
+            }
         });
         info.setActors(actors);
     }
