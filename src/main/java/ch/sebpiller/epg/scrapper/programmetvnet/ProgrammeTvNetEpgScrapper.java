@@ -100,6 +100,8 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
                     LOG.trace("============================= {}", DAYSTR_FORMAT.format(dayFetch));
             } while (hasMoreData);
         }
+
+        LOG.info("scrapper {} has completed", this);
     }
 
     void scrapeDocument(Document doc, Predicate<EpgInfo> scrapeDetails, EpgInfoScrappedListener listener) {

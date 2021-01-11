@@ -59,6 +59,8 @@ public class OcsEpgScrapper implements EpgScrapper {
                 dayFetch = dayFetch.plusDays(1); // tomorrow
             }
         } while (hasMoreData);
+
+        LOG.info("scrapper {} has completed", this);
     }
 
     void scrapeDocument(Document doc, Predicate<Channel> filterChannel, Predicate<EpgInfo> scrapeDetails, EpgInfoScrappedListener listener) {

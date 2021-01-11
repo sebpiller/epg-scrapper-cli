@@ -126,8 +126,11 @@ public class ScrapperCli implements Callable<Integer> {
         System.exit(exitCode);
     }
 
+    private int i;
+
     @Override
     public Integer call() {
+        this.i = 0;
         String s = StringUtils.join(ScrapperCli.class.getAnnotation(Command.class).header(), "\n");
 
         s = s + "\n" + "version: " + getVersion() + "\n";
@@ -158,8 +161,13 @@ public class ScrapperCli implements Callable<Integer> {
                 new ProgrammeTvNetEpgScrapper()
         );
 
+        long start = System.currentTimeMillis();
         scrappers.parallelStream().forEach(epgScrapper -> epgScrapper.scrapeEpg(x -> true, x -> true, x -> {
             synchronized (xmlTvEpgProducer) {
+                this.i++;
+                if (this.i % 100 == 0) {
+                    LOG.info("scrapped {} infos in {}s", this.i, (System.currentTimeMillis() - start) / 1_000);
+                }
                 xmlTvEpgProducer.dumpInfo(doc, root, x);
             }
 

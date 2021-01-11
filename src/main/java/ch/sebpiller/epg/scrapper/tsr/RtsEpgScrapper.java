@@ -123,6 +123,8 @@ public class RtsEpgScrapper implements EpgScrapper {
 
             dayFetch = dayFetch.plusDays(1); // tomorrow
         } while (hasMoreData);
+
+        LOG.info("scrapper {} has completed", this);
     }
 
     /**
