@@ -1,5 +1,6 @@
 package ch.sebpiller.epg.scrapper;
 
+import ch.sebpiller.epg.producer.SaxXmlTvEpgProducer;
 import ch.sebpiller.epg.producer.XmlTvEpgProducer;
 import ch.sebpiller.epg.scrapper.ocs.OcsEpgScrapper;
 import ch.sebpiller.epg.scrapper.playtvfr.PlayTvFrEpgScrapper;
@@ -22,13 +23,11 @@ import javax.validation.ValidatorFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -140,19 +139,6 @@ public class ScrapperCli implements Callable<Integer> {
         // Validation of the injected configuration
         validateThis();
 
-        DocumentBuilder db;
-        try {
-            db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            throw new AssertionError("java xml configuration is invalid: " + e, e);
-        }
-
-        Document doc = db.newDocument();
-
-        XmlTvEpgProducer xmlTvEpgProducer = new XmlTvEpgProducer();
-        Element root = xmlTvEpgProducer.createRootElement(doc);
-        xmlTvEpgProducer.dumpChannels(doc, root);
-
         // All scrappers are run in parallel
         List<EpgScrapper> scrappers = Arrays.asList(
                 new RtsEpgScrapper(),
@@ -162,31 +148,20 @@ public class ScrapperCli implements Callable<Integer> {
         );
 
         long start = System.currentTimeMillis();
-        scrappers.parallelStream().forEach(epgScrapper -> epgScrapper.scrapeEpg(x -> true, x -> true, x -> {
-            synchronized (xmlTvEpgProducer) {
+
+        try (OutputStream os = new FileOutputStream(cliParamOutput);
+             SaxXmlTvEpgProducer xmlProducer = new SaxXmlTvEpgProducer(os)) {
+            scrappers.parallelStream().forEach(epgScrapper -> epgScrapper.scrapeEpg(x -> true, x -> true, x -> {
                 this.i++;
                 if (this.i % 100 == 0) {
                     LOG.info("scrapped {} infos in {}s", this.i, (System.currentTimeMillis() - start) / 1_000);
                 }
-                xmlTvEpgProducer.dumpInfo(doc, root, x);
-            }
 
-            return true;
-        }));
-
-        Transformer t;
-        try {
-            t = TransformerFactory.newInstance().newTransformer();
-        } catch (TransformerConfigurationException e) {
-            throw new AssertionError("java xml configuration is invalid: " + e, e);
-        }
-
-        t.setOutputProperty(OutputKeys.INDENT, "no");
-        t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-
-        try (OutputStream os = new FileOutputStream(this.cliParamOutput)) {
-            t.transform(new DOMSource(doc), new StreamResult(os));
-        } catch (TransformerException | IOException e) {
+                return xmlProducer.epgInfoScrapped(x);
+            }));
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
 

@@ -1,7 +1,16 @@
 package ch.sebpiller.epg;
 
+import ch.sebpiller.epg.producer.SaxXmlTvEpgProducer;
 import ch.sebpiller.epg.producer.XmlTvEpgProducer;
+import ch.sebpiller.epg.scrapper.EpgInfoScrappedListener;
+import ch.sebpiller.epg.scrapper.EpgScrapper;
+import ch.sebpiller.epg.scrapper.ocs.OcsEpgScrapper;
+import ch.sebpiller.epg.scrapper.playtvfr.PlayTvFrEpgScrapper;
+import ch.sebpiller.epg.scrapper.programmetvnet.ProgrammeTvNetEpgScrapper;
+import ch.sebpiller.epg.scrapper.tsr.RtsEpgScrapper;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -15,11 +24,16 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
+import java.io.OutputStream;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class EpgInfosToEpgGuideTest {
+    private static final Logger LOG = LoggerFactory.getLogger(EpgInfosToEpgGuideTest.class);
 
     @Test
     public void exportSerializedObjectsToEpgGuide() throws Exception {
@@ -45,12 +59,14 @@ public class EpgInfosToEpgGuideTest {
 
         infos.addAll(infos4);
 
-        Document doc = buildDocumentFromEpgInfo(infos);
+        exportUsingSax(infos);
+
+        /*Document doc = buildDocumentFromEpgInfo(infos);
         Transformer t = TransformerFactory.newInstance().newTransformer();
         t.setOutputProperty(OutputKeys.INDENT, "yes");
         t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
         t.transform(new DOMSource(doc), new StreamResult(System.out));
-        t.transform(new DOMSource(doc), new StreamResult(new FileOutputStream("/home/spiller/tv/config/data/epg.xml")));
+        t.transform(new DOMSource(doc), new StreamResult(new FileOutputStream("/home/spiller/tv/config/data/epg.xml")));*/
     }
 
     private Document buildDocumentFromEpgInfo(List<EpgInfo> infos) throws ParserConfigurationException {
@@ -70,6 +86,39 @@ public class EpgInfosToEpgGuideTest {
         infos.forEach(epgInfo -> epgInfoDumper.dumpInfo(doc, root, epgInfo));
 
         return doc;
+    }
+
+    private int i;
+
+    private void exportUsingSax(List<EpgInfo> infos) {
+        i = 0;
+
+        // Fake scrappers using a List<EpgInfo> as source
+        List<EpgScrapper> scrappers = Arrays.asList(
+                (filterChannel, scrapeDetails, listener) -> {
+                    for (EpgInfo info : infos) {
+                        listener.epgInfoScrapped(info);
+                    }
+                }
+        );
+
+        long start = System.currentTimeMillis();
+
+        try (OutputStream os = new FileOutputStream("target/pouet.xml");
+             SaxXmlTvEpgProducer xmlProducer = new SaxXmlTvEpgProducer(os)) {
+            scrappers.parallelStream().forEach(epgScrapper -> epgScrapper.scrapeEpg(x -> true, x -> true, x -> {
+                this.i++;
+                if (this.i % 100 == 0) {
+                    LOG.info("scrapped {} infos in {}s", this.i, (System.currentTimeMillis() - start) / 1_000);
+                }
+
+                return xmlProducer.epgInfoScrapped(x);
+            }));
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
