@@ -65,17 +65,25 @@ public class PlayTvFrEpgScrapper implements EpgScrapper {
             }
 
             do {
+                String url = ROOT_URL + '/' + c.getValue() + '/' + DAYSTR_FORMAT.format(dayFetch) + '/';
                 try {
                     // fetch data for current channel
-                    doc = Jsoup.connect(ROOT_URL + '/' + c.getValue() + '/' + DAYSTR_FORMAT.format(dayFetch) + '/').get();
+                    doc = Jsoup.connect(url).get();
                     //System.out.println(doc);
 
                     scrapeDocument(doc, scrapeDetails, listener);
                     dayFetch = dayFetch.plusDays(1); // tomorrow
                 } catch (HttpStatusException e) {
                     if (e.getStatusCode() == 404) {
+                        // epg for this day is not available yet
+                        hasMoreData = false;
+                    } else if (e.getStatusCode() == 503) {
+                        // sometimes throws 503 - Service unavailable
+                        LOG.warn("URL '{}' resulted in a '503 - Service unavailable error'. " +
+                                "Skipping the whole scrapper", url);
                         hasMoreData = false;
                     } else {
+                        // fatal
                         throw new RuntimeException(e);
                     }
                 } catch (IOException e) {
@@ -87,7 +95,8 @@ public class PlayTvFrEpgScrapper implements EpgScrapper {
             } while (hasMoreData);
         }
 
-        LOG.info("scrapper {} has completed", this);
+        if (LOG.isInfoEnabled())
+            LOG.info("scrapper {} has completed", this);
     }
 
     void scrapeDocument(Document doc, Predicate<EpgInfo> scrapeDetails, EpgInfoScrappedListener listener) {
@@ -137,7 +146,7 @@ public class PlayTvFrEpgScrapper implements EpgScrapper {
                 }
             }
 
-            if(StringUtils.isNotBlank(subtitle)) {
+            if (StringUtils.isNotBlank(subtitle)) {
                 info.setSubtitle(subtitle);
             }
 

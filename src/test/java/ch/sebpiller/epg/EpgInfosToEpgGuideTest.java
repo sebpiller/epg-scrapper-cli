@@ -2,12 +2,7 @@ package ch.sebpiller.epg;
 
 import ch.sebpiller.epg.producer.SaxXmlTvEpgProducer;
 import ch.sebpiller.epg.producer.XmlTvEpgProducer;
-import ch.sebpiller.epg.scrapper.EpgInfoScrappedListener;
 import ch.sebpiller.epg.scrapper.EpgScrapper;
-import ch.sebpiller.epg.scrapper.ocs.OcsEpgScrapper;
-import ch.sebpiller.epg.scrapper.playtvfr.PlayTvFrEpgScrapper;
-import ch.sebpiller.epg.scrapper.programmetvnet.ProgrammeTvNetEpgScrapper;
-import ch.sebpiller.epg.scrapper.tsr.RtsEpgScrapper;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,20 +12,11 @@ import org.w3c.dom.Element;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
-import java.util.function.Predicate;
 
 public class EpgInfosToEpgGuideTest {
     private static final Logger LOG = LoggerFactory.getLogger(EpgInfosToEpgGuideTest.class);

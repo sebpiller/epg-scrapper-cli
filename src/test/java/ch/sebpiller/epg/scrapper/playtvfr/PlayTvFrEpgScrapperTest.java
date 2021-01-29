@@ -2,7 +2,6 @@ package ch.sebpiller.epg.scrapper.playtvfr;
 
 import ch.sebpiller.epg.Audience;
 import ch.sebpiller.epg.EpgInfo;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.Test;

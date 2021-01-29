@@ -1,7 +1,6 @@
 package ch.sebpiller.epg.scrapper;
 
 import ch.sebpiller.epg.producer.SaxXmlTvEpgProducer;
-import ch.sebpiller.epg.producer.XmlTvEpgProducer;
 import ch.sebpiller.epg.scrapper.ocs.OcsEpgScrapper;
 import ch.sebpiller.epg.scrapper.playtvfr.PlayTvFrEpgScrapper;
 import ch.sebpiller.epg.scrapper.programmetvnet.ProgrammeTvNetEpgScrapper;
@@ -9,8 +8,6 @@ import ch.sebpiller.epg.scrapper.tsr.RtsEpgScrapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -20,14 +17,10 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.*;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -40,7 +33,7 @@ import java.util.concurrent.Callable;
         description = "Fetch data from multiple sources to populate an EPG.",
         sortOptions = false,
         versionProvider = ScrapperCli.VersionProvider.class,
-        header = {"EPG Scrapper"}
+        header = {"spidy-tv-guide - epg scrapper - CLI"}
 )
 public class ScrapperCli implements Callable<Integer> {
     public static final String ARTIFACT_ID = "epg-scrapper";
@@ -131,8 +124,7 @@ public class ScrapperCli implements Callable<Integer> {
     public Integer call() {
         this.i = 0;
         String s = StringUtils.join(ScrapperCli.class.getAnnotation(Command.class).header(), "\n");
-
-        s = s + "\n" + "version: " + getVersion() + "\n";
+        s = s + " " + "version: " + getVersion() + "\n";
 
         LOG.info("booting app...\n{}\n", s);
 
