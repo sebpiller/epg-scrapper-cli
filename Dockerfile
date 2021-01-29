@@ -1,5 +1,5 @@
 FROM debian:buster
-LABEL arch="armhf|armv7|aarch64|amd64|i386"
+LABEL arch="armv7|arm64"
 ENV DEBIAN_FRONTEND=noninteractive
 
 WORKDIR /tmp
@@ -10,7 +10,7 @@ RUN \
 RUN \
     apt-get update -y && \
     apt-get install -y --no-install-recommends --no-install-suggests \
-      openjdk-11-jdk-headless && \
+      openjdk-11-jre-headless && \
 
     rm -rf /var/lib/apt/lists/*
 
