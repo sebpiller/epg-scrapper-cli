@@ -4,6 +4,7 @@ import ch.sebpiller.epg.producer.SaxXmlTvEpgProducer;
 import ch.sebpiller.epg.scrapper.ocs.OcsEpgScrapper;
 import ch.sebpiller.epg.scrapper.playtvfr.PlayTvFrEpgScrapper;
 import ch.sebpiller.epg.scrapper.programmetvnet.ProgrammeTvNetEpgScrapper;
+import ch.sebpiller.epg.scrapper.telecablesatfr.TelecableSatFrScrapper;
 import ch.sebpiller.epg.scrapper.tsr.RtsEpgScrapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -135,7 +136,7 @@ public class ScrapperCli implements Callable<Integer> {
         List<EpgScrapper> scrappers = Arrays.asList(
                 new RtsEpgScrapper(),
                 new OcsEpgScrapper(),
-                new PlayTvFrEpgScrapper(),
+                new TelecableSatFrScrapper(),
                 new ProgrammeTvNetEpgScrapper()
         );
 

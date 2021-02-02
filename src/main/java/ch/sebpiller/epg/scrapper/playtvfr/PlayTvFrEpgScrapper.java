@@ -27,7 +27,10 @@ import java.util.regex.Pattern;
 
 /**
  * Scrape information using https://www.ocs.fr/grille-tv.
+ *
+ * @deprecated PlayTvFr is very unstable and throws 503 errors very often.
  */
+@Deprecated
 public class PlayTvFrEpgScrapper implements EpgScrapper {
     private static final Logger LOG = LoggerFactory.getLogger(PlayTvFrEpgScrapper.class);
 
