@@ -28,8 +28,11 @@ import java.util.regex.Pattern;
 
 /**
  * Scrape information from https://tv-programme.telecablesat.fr.
+ *
+ * @deprecated They are protected against scrapping process with something like CloudFlare I guess...
  */
 // https://tv-programme.telecablesat.fr/chaine/822/rouge-tv.html?date=2021-02-02&period=afternoon
+@Deprecated
 public class TelecableSatFrScrapper implements EpgScrapper {
     private static final Logger LOG = LoggerFactory.getLogger(TelecableSatFrScrapper.class);
 
@@ -74,7 +77,6 @@ public class TelecableSatFrScrapper implements EpgScrapper {
                     try {
                         // fetch data for current channel
                         doc = Jsoup.connect(url).get();
-                        //System.out.println(doc);
 
                         scrapeDocument(doc, scrapeDetails, listener);
                     } catch (HttpStatusException e) {
@@ -125,7 +127,7 @@ public class TelecableSatFrScrapper implements EpgScrapper {
 
             // FIXME it seems they have implemented some sort of scrappers-protection...
             if (li == null) {
-                LOG.warn("skipped bad document. Document is {}", doc);
+                LOG.warn("skipped bad document. Cloudflare protected?");
                 return;
             }
 
