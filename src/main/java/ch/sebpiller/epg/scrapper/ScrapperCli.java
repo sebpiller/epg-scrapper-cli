@@ -136,7 +136,7 @@ public class ScrapperCli implements Callable<Integer> {
         List<EpgScrapper> scrappers = Arrays.asList(
                 new RtsEpgScrapper(),
                 new OcsEpgScrapper(),
-                new TelecableSatFrScrapper(),
+                //new TelecableSatFrScrapper(),
                 new ProgrammeTvNetEpgScrapper()
         );
 
