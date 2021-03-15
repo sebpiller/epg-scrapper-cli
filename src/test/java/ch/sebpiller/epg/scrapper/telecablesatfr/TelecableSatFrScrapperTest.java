@@ -47,8 +47,8 @@ public class TelecableSatFrScrapperTest {
 
         Document doc = Jsoup.parse(getClass().getResourceAsStream("/sample_details_8_playtvfr_rougetv.html"), StandardCharsets.UTF_8.name(), "");
         //scrapper.parseDetails(doc, info = new EpgInfo());
-        // LOG.info("{}", info);
-        //assertThat(info.getCategory()).isNotNull();
+        LOG.info("{}", info);
+        assertThat(info.getCategory()).isNotNull();
         assertThat(info.getAudience()).isEqualTo(Audience.EIGHTEEN);
     }
 

@@ -8,7 +8,6 @@ import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +17,10 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -93,7 +95,7 @@ public class TelecableSatFrScrapper implements EpgScrapper {
                     LOG.trace("============================= {}", DAYSTR_FORMAT.format(dayFetch));
 
                 // prevent 503 from the site when query comes too quickly
-                if (++i % 50 == 0) {
+                if (++i % 1 == 0) {
                     try {
                         Thread.sleep(10_000);
                     } catch (InterruptedException e) {
@@ -118,12 +120,23 @@ public class TelecableSatFrScrapper implements EpgScrapper {
         m = Pattern.compile(DATE_EXTRACTOR).matcher(uri);
         if (!m.matches()) {
             // fallback to parse from ul.nav > li:not(.active) tab in case it doesn't exists in the canonical link
-            String href = doc.selectFirst(".panel-body .tabbable ul.nav li:not(.active) a").attr("href");
+
+            Element li = doc.selectFirst("div.tabbable ul.nav li:not(.active)");
+
+            // FIXME it seems they have implemented some sort of scrappers-protection...
+            if (li == null) {
+                LOG.warn("skipped bad document. Document is {}", doc);
+                return;
+            }
+
+            String href = li.select("a").attr("href");
             m = Pattern.compile(DATE_EXTRACTOR).matcher(href);
             if (!m.matches()) {
                 throw new RuntimeException("can not find date of document");
             }
         }
+
+        LOG.info("OK dude!");
 
         LocalDate date = LocalDate.from(DAYSTR_FORMAT.parse(m.group(1)));
 
