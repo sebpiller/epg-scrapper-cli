@@ -97,7 +97,7 @@ public class TelecableSatFrScrapper implements EpgScrapper {
                     LOG.trace("============================= {}", DAYSTR_FORMAT.format(dayFetch));
 
                 // prevent 503 from the site when query comes too quickly
-                if (++i % 1 == 0) {
+                if (++i % 10 == 0) {
                     try {
                         Thread.sleep(10_000);
                     } catch (InterruptedException e) {
