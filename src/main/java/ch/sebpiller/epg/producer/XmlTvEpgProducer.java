@@ -8,6 +8,10 @@ import org.w3c.dom.Element;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * @deprecated use {@link SaxXmlTvEpgProducer} instead (less memory footprint).
+ */
+@Deprecated
 public class XmlTvEpgProducer {
     public static final DateTimeFormatter DATETIME = DateTimeFormatter.ofPattern("yyyyMMddHHmmssZ");
 
