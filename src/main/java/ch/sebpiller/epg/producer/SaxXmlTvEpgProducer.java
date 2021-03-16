@@ -16,29 +16,26 @@ import java.time.format.DateTimeFormatter;
 
 public class SaxXmlTvEpgProducer implements EpgInfoScrappedListener, AutoCloseable {
     public static final DateTimeFormatter DATETIME = DateTimeFormatter.ofPattern("yyyyMMddHHmmssZ");
+    private static final boolean indent = false;
     private final XMLStreamWriter out;
 
-    private static final boolean indent = false;
-
     public SaxXmlTvEpgProducer(OutputStream os) throws XMLStreamException {
-        out = indent ?
-                new IndentingXMLStreamWriter(
-                        XMLOutputFactory.newInstance().createXMLStreamWriter(
-                                new OutputStreamWriter(os, StandardCharsets.UTF_8)
-                        )
-                ) :
-                XMLOutputFactory.newInstance().createXMLStreamWriter(
-                        new OutputStreamWriter(os, StandardCharsets.UTF_8)
-                )
-        ;
+        out = XMLOutputFactory.newInstance().createXMLStreamWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
+        if (indent) {
+            out = new IndentingXMLStreamWriter(out);
+        }
 
         out.writeStartDocument();
         out.writeStartElement("tv");
         out.writeAttribute("source-info-url", "https://www.rts.ch/programme-tv/");
         out.writeAttribute("source-data-url", "https://www.rts.ch/programme-tv/");
         out.writeAttribute("generator-info-name", "spidy-tv-guide");
-        out.writeAttribute("generator-info-url", "https://home.sebpiller.ch;me@sebpiller.ch");
+        out.writeAttribute("generator-info-url", "https://github.com/sebpiller/sebpiller");
 
+        writeChannelList();
+    }
+
+    private void writeChannelList() throws XMLStreamException {
         for (Channel c : Channel.values()) {
             out.writeStartElement("channel");
             out.writeAttribute("id", c.name());
@@ -68,21 +65,25 @@ public class SaxXmlTvEpgProducer implements EpgInfoScrappedListener, AutoCloseab
 
     private void doWriteInfo(EpgInfo info) throws XMLStreamException {
         out.writeStartElement("programme");
+
         out.writeAttribute("channel", info.getChannel().name());
-        out.writeAttribute("start", formatLocalDateTimeForEpg(info.getTimeStart()));
-        out.writeAttribute("stop", formatLocalDateTimeForEpg(info.getTimeStop()));
+        out.writeAttribute("start", formatZonedDateTimeForEpg(info.getTimeStart()));
+        out.writeAttribute("stop", formatZonedDateTimeForEpg(info.getTimeStop()));
 
-        out.writeStartElement("title");
-        out.writeCharacters(info.getTitle());
+        writeTag("title", info.getTitle());
+        writeTag("sub-title", info.getSubtitle());
+        writeTag("category", info.getCategory());
+        writeDescriptionInfo(info);
+        writeCreditsInfo(info);
+        writeAudienceInfo(info);
+        writeEpisodeInfo(info);
+
         out.writeEndElement();
+    }
 
-        if (info.getCategory() != null) {
-            out.writeStartElement("category");
-            out.writeCharacters(info.getCategory());
-            out.writeEndElement();
-        }
-
+    private void writeCreditsInfo(EpgInfo info) throws XMLStreamException {
         out.writeStartElement("credits");
+
         if (info.getDirectors() != null) {
             info.getDirectors().forEach(d -> {
                 try {
@@ -94,6 +95,7 @@ public class SaxXmlTvEpgProducer implements EpgInfoScrappedListener, AutoCloseab
                 }
             });
         }
+
         if (info.getActors() != null) {
             info.getActors().forEach(d -> {
                 try {
@@ -105,9 +107,11 @@ public class SaxXmlTvEpgProducer implements EpgInfoScrappedListener, AutoCloseab
                 }
             });
         }
-        out.writeEndElement();
 
-        ///////////
+        out.writeEndElement();
+    }
+
+    private void writeAudienceInfo(EpgInfo info) throws XMLStreamException {
         if (info.getAudience() != null) {
             out.writeStartElement("rating");
             out.writeAttribute("system", "FSK");
@@ -139,23 +143,26 @@ public class SaxXmlTvEpgProducer implements EpgInfoScrappedListener, AutoCloseab
             out.writeEndElement();
             out.writeEndElement();
         }
+    }
 
-        ///////////////
-        if (info.getSubtitle() != null) {
-            out.writeStartElement("sub-title");
-            out.writeCharacters(info.getSubtitle());
+    private void writeTag(String tag, String text) throws XMLStreamException {
+        if (text != null) {
+            out.writeStartElement(tag);
+            out.writeCharacters(text);
             out.writeEndElement();
         }
+    }
 
-        //////////////
+    private void writeDescriptionInfo(EpgInfo info) throws XMLStreamException {
         if (info.getDescription() != null) {
             out.writeStartElement("desc");
             out.writeAttribute("lang", "fr");
             out.writeCharacters(info.getDescription());
             out.writeEndElement();
         }
+    }
 
-        /////////////
+    private void writeEpisodeInfo(EpgInfo info) throws XMLStreamException {
         // <episode-num system="xmltv_ns">4.18.</episode-num>
         if (info.getEpisode() != null) {
             out.writeStartElement("episode-num");
@@ -163,11 +170,9 @@ public class SaxXmlTvEpgProducer implements EpgInfoScrappedListener, AutoCloseab
             out.writeCharacters(info.getEpisode());
             out.writeEndElement();
         }
-
-        out.writeEndElement();
     }
 
-    private String formatLocalDateTimeForEpg(ZonedDateTime ldt) {
+    private String formatZonedDateTimeForEpg(ZonedDateTime ldt) {
         // "20210107000500+0100"
         return ldt == null ? null : DATETIME.format(ldt);
     }
