@@ -5,6 +5,7 @@ import ch.sebpiller.epg.Channel;
 import ch.sebpiller.epg.EpgInfo;
 import ch.sebpiller.epg.scrapper.EpgInfoScrappedListener;
 import ch.sebpiller.epg.scrapper.EpgScrapper;
+import ch.sebpiller.epg.scrapper.ScrappingException;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -75,7 +76,7 @@ public class RtsEpgScrapper implements EpgScrapper {
     private int timeoutCount;
 
     @Override
-    public void scrapeEpg(Predicate<Channel> filterChannel, Predicate<EpgInfo> scrapeDetails, EpgInfoScrappedListener listener) {
+    public void scrapeEpg(Predicate<Channel> filterChannel, EpgInfoScrappedListener listener) {
         this.timeoutCount = 0;
         this.lastEpg.clear();
 
@@ -101,7 +102,7 @@ public class RtsEpgScrapper implements EpgScrapper {
                     } catch (HttpStatusException e) {
                         // only 404 are considered as end of stream, others are errors to be reported.
                         if (e.getStatusCode() != 404) {
-                            throw new RuntimeException(e);
+                            throw new ScrappingException(e);
                         }
 
                         // no more data, bye bye
@@ -110,14 +111,14 @@ public class RtsEpgScrapper implements EpgScrapper {
                     } catch (SocketTimeoutException ste) {
                         handleTimeout(ste);
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        throw new ScrappingException(e);
                     }
                 } while (!ok);
 
                 if (LOG.isTraceEnabled())
                     LOG.trace("============================= {}", DAYSTR_FORMAT.format(dayFetch));
                 if (doc != null) {
-                    scrapeDocument(doc, filterChannel, scrapeDetails, listener);
+                    scrapeDocument(doc, filterChannel, listener);
                 }
             }
 
@@ -131,7 +132,7 @@ public class RtsEpgScrapper implements EpgScrapper {
      * Scrape the given document and send results to the listener. The document is expected to contain an html dom
      * with a node "section" assigned classes "schedules" and "day".
      */
-    void scrapeDocument(Document doc, Predicate<Channel> filterChannel, Predicate<EpgInfo> scrapeDetails, EpgInfoScrappedListener listener) {
+    void scrapeDocument(Document doc, Predicate<Channel> filterChannel, EpgInfoScrappedListener listener) {
         Elements epg = doc.select("section.schedules.day");
         if (epg.size() != 1) {
             throw new IllegalArgumentException("invalid document: no unique 'section' with classes 'schedules' and 'day' !");
@@ -220,10 +221,7 @@ public class RtsEpgScrapper implements EpgScrapper {
                 info.setSubtitle(subtitle);
                 info.setEpisode(episode);
 
-                // details are expensive to fetch. Some are filtered out by default.
-                if (scrapeDetails.test(info)) {
-                    parseDetails(detailUriId, info);
-                }
+                parseDetails(detailUriId, info);
 
                 // we can not notify the recipient yet, we need the next entry on the same channel
                 // to be able to determine the duration of this entry.
@@ -239,7 +237,7 @@ public class RtsEpgScrapper implements EpgScrapper {
         } catch (HttpStatusException e) {
             // only 404 are considered non fatal
             if (e.getStatusCode() != 404) {
-                throw new RuntimeException(e);
+                throw new ScrappingException(e);
             }
 
             return;
@@ -248,7 +246,7 @@ public class RtsEpgScrapper implements EpgScrapper {
             parseDetails(detailUriId, info);
             return;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ScrappingException(e);
         }
 
         parseDetails(info, doc);
@@ -338,7 +336,7 @@ public class RtsEpgScrapper implements EpgScrapper {
                 Thread.currentThread().interrupt();
             }
         } else {
-            throw new RuntimeException(re);
+            throw new ScrappingException(re);
         }
     }
 

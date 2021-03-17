@@ -4,6 +4,7 @@ import ch.sebpiller.epg.Channel;
 import ch.sebpiller.epg.EpgInfo;
 import ch.sebpiller.epg.scrapper.EpgInfoScrappedListener;
 import ch.sebpiller.epg.scrapper.EpgScrapper;
+import ch.sebpiller.epg.scrapper.ScrappingException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -42,41 +43,28 @@ public class TvSearchCh implements EpgScrapper {
     private final Map<Channel, EpgInfo> lastEpgs = Collections.synchronizedMap(new HashMap<>());
 
     @Override
-    public void scrapeEpg(Predicate<Channel> filterChannel, Predicate<EpgInfo> scrapeDetails, EpgInfoScrappedListener listener) {
+    public void scrapeEpg(Predicate<Channel> filterChannel, EpgInfoScrappedListener listener) {
         this.lastEpgs.clear();
-        Document doc;
 
-        int i = 0;
-        for (Map.Entry<Channel, String> c : CHANNELS.entrySet()) {
-            boolean hasMoreData = true;
+        CHANNELS.entrySet().stream()
+                .filter(e -> filterChannel.test(e.getKey()))
+                .forEach(e -> {
+                            String url = String.format(ROOT_URL, e.getValue());
 
-            LocalDate dayFetch = LocalDate.now();
-            if (!filterChannel.test(c.getKey())) {
-                continue;
-            }
-
-            do {
-                String url = String.format(ROOT_URL, c.getValue());
-                hasMoreData = false;
-
-                try {
-                    doc = Jsoup.connect(url).get();
-                    scrapeDocument(doc, scrapeDetails, listener, c.getKey());
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                dayFetch = dayFetch.plusDays(1); // tomorrow
-
-//                if (LOG.isTraceEnabled())
-//                    LOG.trace("============================= {}", DAYSTR_FORMAT.format(dayFetch));
-            } while (hasMoreData);
-        }
+                            try {
+                                Document doc = Jsoup.connect(url).get();
+                                scrapeDocumentForChannel(doc, e.getKey(), listener);
+                            } catch (IOException ioe) {
+                                throw new ScrappingException(ioe);
+                            }
+                        }
+                );
 
         if (LOG.isInfoEnabled())
             LOG.info("scrapper {} has completed", this);
     }
 
-    void scrapeDocument(Document doc, Predicate<EpgInfo> scrapeDetails, EpgInfoScrappedListener listener, Channel c) {
+    void scrapeDocumentForChannel(Document doc, Channel c, EpgInfoScrappedListener listener) {
         Pattern extractDate = Pattern.compile("^.*(\\d{4}-\\d{2}-\\d{2})T.*$");
 
         for (Element li : doc.select("ol.tv-shows.tv-search-results li")) {
@@ -85,7 +73,7 @@ public class TvSearchCh implements EpgScrapper {
 
             Matcher matcher = extractDate.matcher(href);
             if (!matcher.matches()) {
-                throw new RuntimeException("unable to extract the date");
+                throw new ScrappingException("unable to extract the date");
             }
 
             String date = matcher.group(1);

@@ -56,7 +56,7 @@ public class PlayTvFrEpgScrapper implements EpgScrapper {
     private final Map<Channel, EpgInfo> lastEpgs = Collections.synchronizedMap(new HashMap<>());
 
     @Override
-    public void scrapeEpg(Predicate<Channel> filterChannel, Predicate<EpgInfo> scrapeDetails, EpgInfoScrappedListener listener) {
+    public void scrapeEpg(Predicate<Channel> filterChannel, EpgInfoScrappedListener listener) {
         this.lastEpgs.clear();
         Document doc;
 
@@ -74,7 +74,7 @@ public class PlayTvFrEpgScrapper implements EpgScrapper {
                     doc = Jsoup.connect(url).get();
                     //System.out.println(doc);
 
-                    scrapeDocument(doc, scrapeDetails, listener);
+                    scrapeDocument(doc, listener);
                     dayFetch = dayFetch.plusDays(1); // tomorrow
                 } catch (HttpStatusException e) {
                     if (e.getStatusCode() == 404) {
@@ -102,7 +102,7 @@ public class PlayTvFrEpgScrapper implements EpgScrapper {
             LOG.info("scrapper {} has completed", this);
     }
 
-    void scrapeDocument(Document doc, Predicate<EpgInfo> scrapeDetails, EpgInfoScrappedListener listener) {
+    void scrapeDocument(Document doc, EpgInfoScrappedListener listener) {
         // <meta property="og:url" content="https://playtv.fr/programmes-tv/rouge-tv/11-01-2021/">
         Elements ogUrl = doc.getElementsByAttributeValue("property", "og:url");
         String uri = ogUrl.attr("content");
@@ -171,10 +171,7 @@ public class PlayTvFrEpgScrapper implements EpgScrapper {
             // info.setSubtitle(a.selectFirst(".singleBroadcastCard-subtitle").text());
             // info.setCategory(resolveCategory(a.selectFirst(".singleBroadcastCard-genre").text()));
 
-            // details are expensive to fetch. Some are filtered out by default.
-            if (scrapeDetails.test(info)) {
-                parseDetails(R_URL + title.attr("href"), info);
-            }
+            parseDetails(R_URL + title.attr("href"), info);
 
             this.lastEpgs.computeIfPresent(c, (channel, epgInfo) -> {
                 epgInfo.setTimeStop(zdt);
@@ -189,12 +186,7 @@ public class PlayTvFrEpgScrapper implements EpgScrapper {
     }
 
 
-    private void parseDetails(String uri, EpgInfo info) {
-        // TODO
-      /*  if(true) {
-            return;
-        }*/
-
+    void parseDetails(String uri, EpgInfo info) {
         try {
             parseDetails(Jsoup.connect(uri).get(), info);
         } catch (HttpStatusException e) {

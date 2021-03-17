@@ -1,7 +1,10 @@
 package ch.sebpiller.epg.scrapper.ocs;
 
 import ch.sebpiller.epg.EpgInfo;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,17 +16,18 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OcsEpgScrapperIntegrationTest {
+@EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
+class OcsEpgScrapperIntegrationTest {
     private static final Logger LOG = LoggerFactory.getLogger(OcsEpgScrapperIntegrationTest.class);
 
     @Test
-    public void testScrapeFromOcs() throws IOException {
+    void testScrapeFromOcs() throws IOException {
         List<EpgInfo> allInfos = new ArrayList<>(25_000);
         final ZonedDateTime inAWeek = ZonedDateTime.now().plus(7, ChronoUnit.DAYS);
 
         long start = System.currentTimeMillis();
         OcsEpgScrapper scrapper = new OcsEpgScrapper();
-        scrapper.scrapeEpg(c -> true, i -> true, e -> {
+        scrapper.scrapeEpg(c -> true, e -> {
             allInfos.add(e);
 
             if (allInfos.size() % 100 == 0) {

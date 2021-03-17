@@ -1,9 +1,8 @@
 package ch.sebpiller.epg.scrapper.telecablesatfr;
 
 import ch.sebpiller.epg.EpgInfo;
-import ch.sebpiller.epg.scrapper.playtvfr.PlayTvFrEpgScrapper;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,18 +12,19 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TelecableSatFrIntegrationTest {
+@EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
+class TelecableSatFrIntegrationTest {
     private static final Logger LOG = LoggerFactory.getLogger(TelecableSatFrIntegrationTest.class);
 
     // TODO implement
     //@Ignore("tobe implemented")
     @Test
-    public void testScrapeFromTelecableSatFr() throws IOException {
+    void testScrapeFromTelecableSatFr() throws IOException {
         List<EpgInfo> allInfos = new ArrayList<>(25_000);
 
         long start = System.currentTimeMillis();
         TelecableSatFrScrapper scrapper = new TelecableSatFrScrapper();
-        scrapper.scrapeEpg(c -> true, i -> true, e -> {
+        scrapper.scrapeEpg(c -> true, e -> {
             allInfos.add(e);
 
             if (allInfos.size() % 100 == 0) {

@@ -4,6 +4,7 @@ import ch.sebpiller.epg.Channel;
 import ch.sebpiller.epg.EpgInfo;
 import ch.sebpiller.epg.scrapper.EpgInfoScrappedListener;
 import ch.sebpiller.epg.scrapper.EpgScrapper;
+import ch.sebpiller.epg.scrapper.ScrappingException;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -69,7 +70,7 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
     private final Map<Channel, EpgInfo> lastEpgs = Collections.synchronizedMap(new HashMap<>());
 
     @Override
-    public void scrapeEpg(Predicate<Channel> filterChannel, Predicate<EpgInfo> scrapeDetails, EpgInfoScrappedListener listener) {
+    public void scrapeEpg(Predicate<Channel> filterChannel, EpgInfoScrappedListener listener) {
         this.lastEpgs.clear();
         Document doc;
 
@@ -84,16 +85,16 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
                 try {
                     // fetch data for current channel
                     doc = Jsoup.connect(ROOT_URL + '/' + DAYSTR_FORMAT.format(dayFetch) + '/' + c.getValue() + ".html").get();
-                    scrapeDocument(doc, scrapeDetails, listener);
+                    scrapeDocument(doc, listener);
                     dayFetch = dayFetch.plusDays(1); // tomorrow
                 } catch (HttpStatusException e) {
                     if (e.getStatusCode() == 404) {
                         hasMoreData = false;
                     } else {
-                        throw new RuntimeException(e);
+                        throw new ScrappingException(e);
                     }
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    throw new ScrappingException(e);
                 }
 
                 if (LOG.isTraceEnabled())
@@ -104,13 +105,13 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
         LOG.info("scrapper {} has completed", this);
     }
 
-    void scrapeDocument(Document doc, Predicate<EpgInfo> scrapeDetails, EpgInfoScrappedListener listener) {
+    void scrapeDocument(Document doc, EpgInfoScrappedListener listener) {
         // https://www.programme-tv.net/programme/chaine/2021-01-14/programme-mangas-82.html
         String uri = doc.getElementsByAttributeValue("rel", "canonical").attr("href");
         Matcher m = Pattern.compile("^.*/(\\d{4}-\\d{2}-\\d{2})/.*$").matcher(uri);
 
         if (!m.matches()) {
-            throw new RuntimeException("can not find date of document");
+            throw new ScrappingException("can not find date of document");
         }
 
         LocalDate date = LocalDate.from(DAYSTR_FORMAT.parse(m.group(1)));
@@ -121,7 +122,7 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
         String text = doc.select(".gridChannel-epgGrid .gridChannel-title").text();
         Channel c = Channel.valueOfAliases(text);
         if (c == null) {
-            throw new RuntimeException("can not find channel " + text);
+            throw new ScrappingException("can not find channel " + text);
         }
 
         /*
@@ -198,10 +199,8 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
 
             info.setCategory(resolveCategory(a.selectFirst(".singleBroadcastCard-genre").text()));
 
-            // details are expensive to fetch. Some are filtered out by default.
-            if (scrapeDetails.test(info)) {
-                parseDetails(title.attr("href"), info);
-            }
+            parseDetails(title.attr("href"), info);
+
 
             this.lastEpgs.computeIfPresent(c, (channel, epgInfo) -> {
                 epgInfo.setTimeStop(zdt);
@@ -228,9 +227,9 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
                 return;
             }
 
-            throw new RuntimeException(e);
+            throw new ScrappingException(e);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ScrappingException(e);
         }
     }
 

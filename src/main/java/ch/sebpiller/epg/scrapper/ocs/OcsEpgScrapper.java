@@ -4,6 +4,7 @@ import ch.sebpiller.epg.Channel;
 import ch.sebpiller.epg.EpgInfo;
 import ch.sebpiller.epg.scrapper.EpgInfoScrappedListener;
 import ch.sebpiller.epg.scrapper.EpgScrapper;
+import ch.sebpiller.epg.scrapper.ScrappingException;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
@@ -38,7 +39,7 @@ public class OcsEpgScrapper implements EpgScrapper {
     private final Map<Channel, EpgInfo> lastEpgs = Collections.synchronizedMap(new HashMap<>());
 
     @Override
-    public void scrapeEpg(Predicate<Channel> filterChannel, Predicate<EpgInfo> scrapeDetails, EpgInfoScrappedListener listener) {
+    public void scrapeEpg(Predicate<Channel> filterChannel, EpgInfoScrappedListener listener) {
         this.lastEpgs.clear();
         LocalDate dayFetch = LocalDate.now();
         Document doc;
@@ -48,14 +49,14 @@ public class OcsEpgScrapper implements EpgScrapper {
                 doc = Jsoup.connect(ROOT_URL + "date=" + DAYSTR_FORMAT.format(dayFetch)).get();
                 hasMoreData = StringUtils.isNotBlank(doc.getElementById("dateInitEpg").attr("value"));
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new ScrappingException(e);
             }
 
             if (LOG.isTraceEnabled())
                 LOG.trace("============================= {}", DAYSTR_FORMAT.format(dayFetch));
 
             if (hasMoreData) {
-                scrapeDocument(doc, filterChannel, scrapeDetails, listener);
+                scrapeDocument(doc, filterChannel, listener);
                 dayFetch = dayFetch.plusDays(1); // tomorrow
             }
         } while (hasMoreData);
@@ -63,7 +64,7 @@ public class OcsEpgScrapper implements EpgScrapper {
         LOG.info("scrapper {} has completed", this);
     }
 
-    void scrapeDocument(Document doc, Predicate<Channel> filterChannel, Predicate<EpgInfo> scrapeDetails, EpgInfoScrappedListener listener) {
+    void scrapeDocument(Document doc, Predicate<Channel> filterChannel, EpgInfoScrappedListener listener) {
         // <input type="hidden" id="dateInitEpg" value="20210116"/>
         String attr = doc.getElementById("dateInitEpg").attr("value");
         LocalDate date = LocalDate.from(DAYSTR_FORMAT.parse(attr));
@@ -106,14 +107,13 @@ public class OcsEpgScrapper implements EpgScrapper {
                 info.setTitle(a.selectFirst(".program-title").text());
                 info.setCategory(resolveCategory(a.selectFirst(".program-subtitle span").text()));
 
-                // details are expensive to fetch. Some are filtered out by default.
-                if (scrapeDetails.test(info)) {
-                    // data-detaillink="https://www.ocs.fr/programme/LAPROIEXXXXW0051426">
-                    String detailUri = a.attr("data-detaillink");
-                    if (!"#".equals(detailUri)) {
-                        parseDetails(detailUri, info);
-                    }
+
+                // data-detaillink="https://www.ocs.fr/programme/LAPROIEXXXXW0051426">
+                String detailUri = a.attr("data-detaillink");
+                if (!"#".equals(detailUri)) {
+                    parseDetails(detailUri, info);
                 }
+
 
                 this.lastEpgs.computeIfPresent(c, (channel, epgInfo) -> {
                     epgInfo.setTimeStop(zdt);
@@ -140,9 +140,9 @@ public class OcsEpgScrapper implements EpgScrapper {
                 return;
             }
 
-            throw new RuntimeException(e);
+            throw new ScrappingException(e);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ScrappingException(e);
         }
     }
 

@@ -1,7 +1,8 @@
 package ch.sebpiller.epg.scrapper.playtvfr;
 
 import ch.sebpiller.epg.EpgInfo;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,16 +12,17 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlayTvFrEpgScrapperIntegrationTest {
+@EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
+class PlayTvFrEpgScrapperIntegrationTest {
     private static final Logger LOG = LoggerFactory.getLogger(PlayTvFrEpgScrapperIntegrationTest.class);
 
     @Test
-    public void testScrapeFromPlayTvFr() throws IOException {
+    void testScrapeFromPlayTvFr() throws IOException {
         List<EpgInfo> allInfos = new ArrayList<>(25_000);
 
         long start = System.currentTimeMillis();
         PlayTvFrEpgScrapper scrapper = new PlayTvFrEpgScrapper();
-        scrapper.scrapeEpg(c -> true, i -> true, e -> {
+        scrapper.scrapeEpg(c -> true, e -> {
             allInfos.add(e);
 
             if (allInfos.size() % 100 == 0) {

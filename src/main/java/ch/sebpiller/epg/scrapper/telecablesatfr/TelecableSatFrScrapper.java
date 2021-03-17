@@ -59,7 +59,7 @@ public class TelecableSatFrScrapper implements EpgScrapper {
     private final Map<Channel, EpgInfo> lastEpgs = Collections.synchronizedMap(new HashMap<>());
 
     @Override
-    public void scrapeEpg(Predicate<Channel> filterChannel, Predicate<EpgInfo> scrapeDetails, EpgInfoScrappedListener listener) {
+    public void scrapeEpg(Predicate<Channel> filterChannel, EpgInfoScrappedListener listener) {
         this.lastEpgs.clear();
         Document doc;
 
@@ -78,7 +78,7 @@ public class TelecableSatFrScrapper implements EpgScrapper {
                         // fetch data for current channel
                         doc = Jsoup.connect(url).get();
 
-                        scrapeDocument(doc, scrapeDetails, listener);
+                        scrapeDocument(doc, listener);
                     } catch (HttpStatusException e) {
                         if (e.getStatusCode() == 404) {
                             // epg for this day is not available yet
@@ -111,7 +111,7 @@ public class TelecableSatFrScrapper implements EpgScrapper {
             LOG.info("scrapper {} has completed", this);
     }
 
-    void scrapeDocument(Document doc, Predicate<EpgInfo> scrapeDetails, EpgInfoScrappedListener listener) {
+    void scrapeDocument(Document doc, EpgInfoScrappedListener listener) {
         Matcher m;
         // <link rel="canonical" href="https://tv-programme.telecablesat.fr/chaine/822/rouge-tv.html?date=2021-02-03&period=morning">
         String uri = doc.getElementsByAttributeValue("rel", "canonical").attr("href");

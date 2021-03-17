@@ -3,7 +3,7 @@ package ch.sebpiller.epg;
 import ch.sebpiller.epg.producer.SaxXmlTvEpgProducer;
 import ch.sebpiller.epg.producer.XmlTvEpgProducer;
 import ch.sebpiller.epg.scrapper.EpgScrapper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -18,11 +18,11 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
 
-public class EpgInfosToEpgGuideTest {
+class EpgInfosToEpgGuideTest {
     private static final Logger LOG = LoggerFactory.getLogger(EpgInfosToEpgGuideTest.class);
 
     @Test
-    public void exportSerializedObjectsToEpgGuide() throws Exception {
+    void exportSerializedObjectsToEpgGuide() throws Exception {
         ObjectInputStream ois = new ObjectInputStream(getClass().getResourceAsStream("/all_epg_info.data"));
         List<EpgInfo> infos = (List<EpgInfo>) ois.readObject();
         ois.close();
@@ -81,7 +81,7 @@ public class EpgInfosToEpgGuideTest {
 
         // Fake scrappers using a List<EpgInfo> as source
         List<EpgScrapper> scrappers = Arrays.asList(
-                (filterChannel, scrapeDetails, listener) -> {
+                (filterChannel, listener) -> {
                     for (EpgInfo info : infos) {
                         listener.epgInfoScrapped(info);
                     }
@@ -92,7 +92,7 @@ public class EpgInfosToEpgGuideTest {
 
         try (OutputStream os = new FileOutputStream("target/pouet.xml");
              SaxXmlTvEpgProducer xmlProducer = new SaxXmlTvEpgProducer(os)) {
-            scrappers.parallelStream().forEach(epgScrapper -> epgScrapper.scrapeEpg(x -> true, x -> true, x -> {
+            scrappers.parallelStream().forEach(epgScrapper -> epgScrapper.scrapeEpg(x -> true, x -> {
                 this.i++;
                 if (this.i % 100 == 0) {
                     LOG.info("scrapped {} infos in {}s", this.i, (System.currentTimeMillis() - start) / 1_000);

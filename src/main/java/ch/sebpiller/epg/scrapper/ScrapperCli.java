@@ -143,7 +143,7 @@ public class ScrapperCli implements Callable<Integer> {
 
         try (OutputStream os = new FileOutputStream(cliParamOutput);
              SaxXmlTvEpgProducer xmlProducer = new SaxXmlTvEpgProducer(os)) {
-            scrappers.parallelStream().forEach(epgScrapper -> epgScrapper.scrapeEpg(x -> true, x -> true, x -> {
+            scrappers.parallelStream().forEach(epgScrapper -> epgScrapper.scrapeEpg(x -> true, x -> {
                 this.i++;
                 if (this.i % 100 == 0) {
                     LOG.info("scrapped {} infos in {}s", this.i, (System.currentTimeMillis() - start) / 1_000);

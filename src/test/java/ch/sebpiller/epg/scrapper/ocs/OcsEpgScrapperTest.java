@@ -3,7 +3,7 @@ package ch.sebpiller.epg.scrapper.ocs;
 import ch.sebpiller.epg.EpgInfo;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,18 +12,18 @@ import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class OcsEpgScrapperTest {
+class OcsEpgScrapperTest {
     private static final Logger LOG = LoggerFactory.getLogger(OcsEpgScrapperTest.class);
     private int i = 0;
 
     @Test
-    public void testScrapeFromLocal() throws IOException {
+    void testScrapeFromLocal() throws IOException {
         Document doc = Jsoup.parse(getClass().getResourceAsStream("/sample_ocs.html"), StandardCharsets.UTF_8.name(), "");
 
         OcsEpgScrapper scrapper = new OcsEpgScrapper();
 
         // do not scrape details
-        scrapper.scrapeDocument(doc, c -> true, x -> false, e -> {
+        scrapper.scrapeDocument(doc, c -> true, e -> {
             i++;
             LOG.info("{}", e);
 
@@ -34,7 +34,7 @@ public class OcsEpgScrapperTest {
     }
 
     @Test
-    public void testScrapeDetailsFromLocal() throws IOException {
+    void testScrapeDetailsFromLocal() throws IOException {
         OcsEpgScrapper scrapper = new OcsEpgScrapper();
         EpgInfo info;
 

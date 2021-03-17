@@ -3,7 +3,8 @@ package ch.sebpiller.epg.scrapper.programmetvnet;
 import ch.sebpiller.epg.EpgInfo;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,18 +13,18 @@ import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ProgrammeTvNetEpgScrapperTest {
+class ProgrammeTvNetEpgScrapperTest {
     private static final Logger LOG = LoggerFactory.getLogger(ProgrammeTvNetEpgScrapperTest.class);
     private int i = 0;
 
     @Test
-    public void testScrapeFromLocal() throws IOException {
+    void testScrapeFromLocal() throws IOException {
         Document doc = Jsoup.parse(getClass().getResourceAsStream("/sample_programmetvnet_mangas.html"), StandardCharsets.UTF_8.name(), "");
 
         ProgrammeTvNetEpgScrapper scrapper = new ProgrammeTvNetEpgScrapper();
 
         // do not scrape details
-        scrapper.scrapeDocument(doc, x -> false, e -> {
+        scrapper.scrapeDocument(doc, e -> {
             this.i++;
             LOG.info("{}", e);
 
@@ -34,7 +35,7 @@ public class ProgrammeTvNetEpgScrapperTest {
     }
 
     @Test
-    public void testScrapeDetailsFromLocal() throws IOException {
+    void testScrapeDetailsFromLocal() throws IOException {
         ProgrammeTvNetEpgScrapper scrapper = new ProgrammeTvNetEpgScrapper();
         EpgInfo info;
 

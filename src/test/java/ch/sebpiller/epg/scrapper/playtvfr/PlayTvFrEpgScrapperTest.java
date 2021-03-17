@@ -4,7 +4,7 @@ import ch.sebpiller.epg.Audience;
 import ch.sebpiller.epg.EpgInfo;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,18 +13,22 @@ import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class PlayTvFrEpgScrapperTest {
+class PlayTvFrEpgScrapperTest {
     private static final Logger LOG = LoggerFactory.getLogger(PlayTvFrEpgScrapperTest.class);
     private int i = 0;
 
     @Test
-    public void testScrapeFromLocal() throws IOException {
+    void testScrapeFromLocal() throws IOException {
         Document doc = Jsoup.parse(getClass().getResourceAsStream("/sample_playtvfr.html"), StandardCharsets.UTF_8.name(), "");
 
-        PlayTvFrEpgScrapper scrapper = new PlayTvFrEpgScrapper();
+        PlayTvFrEpgScrapper scrapper = new PlayTvFrEpgScrapper(){
+            void parseDetails(String uri, EpgInfo info) {
+                // disable parse details
+            }
+        };
 
         // do not scrape details
-        scrapper.scrapeDocument(doc, x -> false, e -> {
+        scrapper.scrapeDocument(doc, e -> {
             this.i++;
             LOG.info("{}", e);
 
@@ -35,7 +39,7 @@ public class PlayTvFrEpgScrapperTest {
     }
 
     @Test
-    public void testScrapeDetailsFromLocal() throws IOException {
+    void testScrapeDetailsFromLocal() throws IOException {
         PlayTvFrEpgScrapper scrapper = new PlayTvFrEpgScrapper();
         EpgInfo info;
 
