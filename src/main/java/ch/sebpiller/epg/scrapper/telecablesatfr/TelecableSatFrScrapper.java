@@ -159,7 +159,7 @@ public class TelecableSatFrScrapper implements EpgScrapper {
         LocalDate ld = date;
 
         // div class="news"
-        for (Element news : doc.select("div.news")) {
+        for (Element news : doc.select("div.news-post")) {
             /*
             <div class="news">
                 <!-- Begin .col-md-1 -->
