@@ -91,8 +91,7 @@ public class TvSearchCh implements EpgScrapper {
             Element descriptionEl = li.selectFirst("div.tv-tooltip dt.tv-detail-description + dd");
             String description = descriptionEl == null ? null : descriptionEl.text();
 
-            EpgInfo info = new EpgInfo();
-            info.setChannel(c);
+            EpgInfo info = new EpgInfo(c);
             info.setTimeStart(zdt);
             info.setTitle(title);
             info.setCategory(category);

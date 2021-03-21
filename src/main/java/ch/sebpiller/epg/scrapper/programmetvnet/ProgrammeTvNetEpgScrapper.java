@@ -179,8 +179,7 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
          */
 
         for (Element a : doc.getElementsByClass("singleBroadcastCard")) {
-            EpgInfo info = new EpgInfo();
-            info.setChannel(c);
+            EpgInfo info = new EpgInfo(c);
 
             String from = a.selectFirst(".singleBroadcastCard-hour").text();
             String[] split = from.split("h");

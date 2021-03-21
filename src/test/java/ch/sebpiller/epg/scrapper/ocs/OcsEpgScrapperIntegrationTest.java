@@ -1,10 +1,9 @@
 package ch.sebpiller.epg.scrapper.ocs;
 
 import ch.sebpiller.epg.EpgInfo;
-
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
-import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
+@DisplayName("OCS Scrapper integration")
 class OcsEpgScrapperIntegrationTest {
     private static final Logger LOG = LoggerFactory.getLogger(OcsEpgScrapperIntegrationTest.class);
 

@@ -213,9 +213,8 @@ public class TelecableSatFrScrapper implements EpgScrapper {
             ZonedDateTime zdt = ZonedDateTime.of(ld, time, ZoneId.of("Europe/Zurich"));
 
 
-            EpgInfo info = new EpgInfo();
+            EpgInfo info = new EpgInfo(c);
             info.setTimeStart(zdt);
-            info.setChannel(c);
             info.setTitle(title);
             info.setSubtitle(subTitle);
 

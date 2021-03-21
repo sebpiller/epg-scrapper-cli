@@ -1,8 +1,8 @@
-package ch.sebpiller.epg;
+package ch.sebpiller.epg.producer;
 
-import ch.sebpiller.epg.producer.SaxXmlTvEpgProducer;
-import ch.sebpiller.epg.producer.XmlTvEpgProducer;
+import ch.sebpiller.epg.EpgInfo;
 import ch.sebpiller.epg.scrapper.EpgScrapper;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,15 +15,18 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@DisplayName("EPG Info Producer test")
 class EpgInfosToEpgGuideTest {
     private static final Logger LOG = LoggerFactory.getLogger(EpgInfosToEpgGuideTest.class);
 
     @Test
     void exportSerializedObjectsToEpgGuide() throws Exception {
-        ObjectInputStream ois = new ObjectInputStream(getClass().getResourceAsStream("/all_epg_info.data"));
+        List<EpgInfo> infos = new ArrayList<>();
+       /* ObjectInputStream ois = new ObjectInputStream(getClass().getResourceAsStream("/all_epg_info.data"));
         List<EpgInfo> infos = (List<EpgInfo>) ois.readObject();
         ois.close();
 
@@ -43,7 +46,7 @@ class EpgInfosToEpgGuideTest {
         List<EpgInfo> infos4 = (List<EpgInfo>) ois.readObject();
         ois.close();
 
-        infos.addAll(infos4);
+        infos.addAll(infos4);*/
 
         exportUsingSax(infos);
 
