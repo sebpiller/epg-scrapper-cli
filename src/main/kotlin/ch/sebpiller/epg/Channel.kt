@@ -1,13 +1,12 @@
-package ch.sebpiller.epg;
+package ch.sebpiller.epg
 
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.Objects;
+import org.apache.commons.lang3.StringUtils
+import java.util.*
 
 /**
  * Lists the supported TV channels with their known aliases.
  */
-public enum Channel {
+enum class Channel(vararg aliases: String) {
     RTS1("tsr1", "rts un"),
     RTS2("tsr2", "rts deux"),
     TF1,
@@ -81,32 +80,32 @@ public enum Channel {
     CHASSE_PECHE("chasse et pêche", "chasse & pêche", "chasse et peche", "chasse & peche"),
 
     // PlayTV.fr
-    ROUGETV("rouge-tv", "rouge tv"),
+    ROUGETV("rouge-tv", "rouge tv")
 
     ;
 
-    private final String[] aliases;
+    private val aliases: Array<String> = arrayOf(*aliases)
 
-    Channel(String... aliases) {
-        this.aliases = aliases;
-    }
+    companion object {
+        /**
+         * Fetch a channel by its Java name or one of its known aliases. Returns null when not found.
+         */
+        @JvmStatic
+        fun valueOfAliases(alias: String): Channel? {
+            return try {
+                valueOf(alias.toUpperCase())
+            } catch (iae: IllegalArgumentException) {
+                val findAny = Arrays
+                        .stream(values())
+                        .filter { channel -> StringUtils.equalsAnyIgnoreCase(alias, *channel.aliases) }
+                        .findAny()
 
-    /**
-     * Fetch a channel by its Java name or one of its known aliases. Returns null when not found.
-     */
-    public static Channel valueOfAliases(String alias) {
-        Objects.requireNonNull(alias);
-
-        try {
-            return valueOf(alias.toUpperCase());
-        } catch (IllegalArgumentException iae) {
-            for (Channel c : values()) {
-                if (StringUtils.equalsAnyIgnoreCase(alias, c.aliases)) {
-                    return c;
+                if (findAny.isPresent) {
+                    findAny.get()
+                } else {
+                    null
                 }
             }
         }
-
-        return null;
     }
 }

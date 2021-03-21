@@ -1,6 +1,7 @@
 package ch.sebpiller.epg.scrapper.programmetvnet;
 
 import ch.sebpiller.epg.EpgInfo;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+@DisplayName("ProgrammeTV Net Scrapper integration")
 @EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
 class ProgrammeTvNetEpgScrapperIntegrationTest {
     private static final Logger LOG = LoggerFactory.getLogger(ProgrammeTvNetEpgScrapperIntegrationTest.class);

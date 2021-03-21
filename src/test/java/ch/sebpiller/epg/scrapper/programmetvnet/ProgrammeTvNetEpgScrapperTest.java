@@ -3,7 +3,7 @@ package ch.sebpiller.epg.scrapper.programmetvnet;
 import ch.sebpiller.epg.EpgInfo;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@DisplayName("ProgrammeTV Net Scrapper test")
 class ProgrammeTvNetEpgScrapperTest {
     private static final Logger LOG = LoggerFactory.getLogger(ProgrammeTvNetEpgScrapperTest.class);
     private int i = 0;

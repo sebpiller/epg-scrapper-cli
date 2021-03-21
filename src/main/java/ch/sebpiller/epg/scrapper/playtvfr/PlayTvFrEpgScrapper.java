@@ -134,8 +134,7 @@ public class PlayTvFrEpgScrapper implements EpgScrapper {
                 continue;
             }
 
-            EpgInfo info = new EpgInfo();
-            info.setChannel(c);
+            EpgInfo info = new EpgInfo(c);
 
             ZonedDateTime zdt = ZonedDateTime.of(ld, time, ZoneId.of("Europe/Zurich"));
             info.setTimeStart(zdt);

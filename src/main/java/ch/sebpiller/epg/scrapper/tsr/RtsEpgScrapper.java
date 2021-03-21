@@ -214,8 +214,7 @@ public class RtsEpgScrapper implements EpgScrapper {
                 }
 
                 // notify callback
-                EpgInfo info = new EpgInfo();
-                info.setChannel(channel);
+                EpgInfo info = new EpgInfo(channel);
                 info.setTimeStart(start);
                 info.setTitle(title);
                 info.setSubtitle(subtitle);
