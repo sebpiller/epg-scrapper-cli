@@ -42,17 +42,6 @@
         <tag>HEAD</tag>
     </scm>
 
-    <distributionManagement>
-        <repository>
-            <id>spidybox-release</id>
-            <url>http://nexus.home/repository/maven-releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>spidybox-snapshots</id>
-            <url>http://nexus.home/repository/maven-snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
-
     <dependencies>
         <!--        <dependency>-->
         <!--            <groupId>junit</groupId>-->
