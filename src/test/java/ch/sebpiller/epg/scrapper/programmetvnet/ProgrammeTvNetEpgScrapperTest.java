@@ -1,5 +1,6 @@
 package ch.sebpiller.epg.scrapper.programmetvnet;
 
+import ch.sebpiller.epg.Channel;
 import ch.sebpiller.epg.EpgInfo;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -22,7 +23,12 @@ class ProgrammeTvNetEpgScrapperTest {
     void testScrapeFromLocal() throws IOException {
         Document doc = Jsoup.parse(getClass().getResourceAsStream("/sample_programmetvnet_mangas.html"), StandardCharsets.UTF_8.name(), "");
 
-        ProgrammeTvNetEpgScrapper scrapper = new ProgrammeTvNetEpgScrapper();
+        ProgrammeTvNetEpgScrapper scrapper = new ProgrammeTvNetEpgScrapper() {
+            @Override
+            void parseDetails(String uri, EpgInfo info) {
+                // noop
+            }
+        };
 
         // do not scrape details
         scrapper.scrapeDocument(doc, e -> {
@@ -41,7 +47,7 @@ class ProgrammeTvNetEpgScrapperTest {
         EpgInfo info;
 
         Document doc = Jsoup.parse(getClass().getResourceAsStream("/sample_details_6_programmetvnet.html"), StandardCharsets.UTF_8.name(), "");
-        scrapper.parseDetails(doc, info = new EpgInfo());
+        scrapper.parseDetails(doc, info = new EpgInfo(Channel.TMC));
         LOG.info("{}", info);
         //assertThat(info.getCategory()).isNotNull();
         assertThat(info.getDescription()).isNotNull();

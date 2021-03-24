@@ -1,13 +1,14 @@
 package ch.sebpiller.epg
 
+import org.apache.commons.lang3.builder.ToStringBuilder
 import java.io.Serializable
 import java.time.ZonedDateTime
 
 /**
  * Models information about an EPG entry. An EPG is constituted by a lot of objects of this type.
  */
-data class EpgInfo(val c: Channel? = null):Serializable {
-    var channel: Channel? = null
+data class EpgInfo(private val c: Channel):Serializable {
+    val channel: Channel = c
     var title: String? = null
 
     /**
@@ -31,7 +32,8 @@ data class EpgInfo(val c: Channel? = null):Serializable {
     var audience: Audience? = null
     var category: String? = null
 
-    init {
-        this.channel = c
+    override fun toString(): String {
+        return ToStringBuilder.reflectionToString(this)
     }
+
 }

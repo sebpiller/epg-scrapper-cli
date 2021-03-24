@@ -26,7 +26,7 @@ class PlayTvFrEpgScrapperTest {
 
         PlayTvFrEpgScrapper scrapper = new PlayTvFrEpgScrapper(){
             void parseDetails(String uri, EpgInfo info) {
-                // disable parse details
+                // noop disable parse details
             }
         };
 

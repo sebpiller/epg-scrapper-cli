@@ -25,7 +25,9 @@ class TelecableSatFrScrapperTest {
                 Jsoup.parse(getClass().getResourceAsStream("/telecablesatfr/sample_noon.html"), StandardCharsets.UTF_8.name(), ""),
         };
 
-        TelecableSatFrScrapper scrapper = new TelecableSatFrScrapper();
+        TelecableSatFrScrapper scrapper = new TelecableSatFrScrapper() {
+
+        };
 
         // do not scrape details
         for (Document doc : docs) {

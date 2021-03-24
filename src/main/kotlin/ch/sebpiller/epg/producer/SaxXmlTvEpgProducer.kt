@@ -16,7 +16,26 @@ import javax.xml.stream.XMLStreamException
 import javax.xml.stream.XMLStreamWriter
 
 class SaxXmlTvEpgProducer(os: OutputStream?) : EpgInfoScrappedListener, AutoCloseable {
-    private var out: XMLStreamWriter
+    private val out: XMLStreamWriter
+
+    init {
+        var o = XMLOutputFactory.newInstance().createXMLStreamWriter(OutputStreamWriter(os, StandardCharsets.UTF_8))
+        if (indent) {
+            o = IndentingXMLStreamWriter(o)
+        }
+
+        out = o
+        with(out) {
+            writeStartDocument()
+            writeStartElement("tv")
+            writeAttribute("source-info-url", "https://www.rts.ch/programme-tv/")
+            writeAttribute("source-data-url", "https://www.rts.ch/programme-tv/")
+            writeAttribute("generator-info-name", "spidy-tv-guide")
+            writeAttribute("generator-info-url", "https://github.com/sebpiller/sebpiller")
+        }
+
+        writeChannelList()
+    }
 
     @Throws(XMLStreamException::class)
     private fun writeChannelList() {
@@ -154,19 +173,5 @@ class SaxXmlTvEpgProducer(os: OutputStream?) : EpgInfoScrappedListener, AutoClos
     companion object {
         val DATETIME = DateTimeFormatter.ofPattern("yyyyMMddHHmmssZ")
         private const val indent = false
-    }
-
-    init {
-        out = XMLOutputFactory.newInstance().createXMLStreamWriter(OutputStreamWriter(os, StandardCharsets.UTF_8))
-        if (indent) {
-            out = IndentingXMLStreamWriter(out)
-        }
-        out.writeStartDocument()
-        out.writeStartElement("tv")
-        out.writeAttribute("source-info-url", "https://www.rts.ch/programme-tv/")
-        out.writeAttribute("source-data-url", "https://www.rts.ch/programme-tv/")
-        out.writeAttribute("generator-info-name", "spidy-tv-guide")
-        out.writeAttribute("generator-info-url", "https://github.com/sebpiller/sebpiller")
-        writeChannelList()
     }
 }
