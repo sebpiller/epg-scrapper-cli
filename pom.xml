@@ -22,8 +22,6 @@
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
-
-        <skipIntegrationTests>false</skipIntegrationTests>
     </properties>
 
     <developers>
@@ -295,7 +293,6 @@
             <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
-                    <skip>${skipIntegrationTests}</skip>
                     <testSourceDirectory>${project.basedir}/src/it/java</testSourceDirectory>
                     <includes>
                         <include>**/*IntegrationTest.java</include>
@@ -310,7 +307,7 @@
                         </goals>
                     </execution>
                     <execution>
-                        <id>verify</id>
+                        <id>verify-it</id>
                         <goals>
                             <goal>verify</goal>
                         </goals>
