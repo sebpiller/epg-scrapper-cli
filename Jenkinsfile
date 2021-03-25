@@ -11,7 +11,7 @@ node {
 
   stage ('Test') {
     withMaven {
-      sh "mvn surefire:test"
+      sh "mvn test -DskipIntegrationTests"
     }
   }
 
