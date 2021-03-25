@@ -11,7 +11,7 @@ node {
 
   stage ('Test') {
     withMaven {
-      sh "mvn test -DskipIntegrationTests"
+      sh "mvn test -DskipIntegrationTests=true"
     }
   }
 
