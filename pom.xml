@@ -295,8 +295,8 @@
             <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
-                    <!--<skip>${skipIntegrationTest}</skip>-->
-                    <testSourceDirectory>${project.basedir}/src/integration-test/java</testSourceDirectory>
+                    <skip>${skipIntegrationTest}</skip>
+                    <testSourceDirectory>${project.basedir}/src/it/java</testSourceDirectory>
                     <includes>
                         <include>**/*IntegrationTest.java</include>
                     </includes>

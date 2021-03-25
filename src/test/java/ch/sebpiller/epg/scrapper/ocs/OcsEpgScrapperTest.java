@@ -23,7 +23,12 @@ class OcsEpgScrapperTest {
     void testScrapeFromLocal() throws IOException {
         Document doc = Jsoup.parse(getClass().getResourceAsStream("/sample_ocs.html"), StandardCharsets.UTF_8.name(), "");
 
-        OcsEpgScrapper scrapper = new OcsEpgScrapper();
+        OcsEpgScrapper scrapper = new OcsEpgScrapper() {
+            @Override
+            public void parseDetails(String uri, EpgInfo info) {
+                // noop
+            }
+        };
 
         // do not scrape details
         scrapper.scrapeDocument(doc, c -> true, e -> {
@@ -38,9 +43,14 @@ class OcsEpgScrapperTest {
 
     @Test
     void testScrapeDetailsFromLocal() throws IOException {
-        OcsEpgScrapper scrapper = new OcsEpgScrapper();
-        EpgInfo info;
+        OcsEpgScrapper scrapper = new OcsEpgScrapper() {
+            @Override
+            public void parseDetails(String uri, EpgInfo info) {
+                // noop
+            }
+        };
 
+        EpgInfo info;
         Document doc;
 
         doc = Jsoup.parse(getClass().getResourceAsStream("/sample_details_4_ocs.html"), StandardCharsets.UTF_8.name(), "");

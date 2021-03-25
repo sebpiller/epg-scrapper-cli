@@ -24,7 +24,7 @@ import java.util.function.Predicate
 /**
  * Scrape information using https://www.ocs.fr/grille-tv.
  */
-class OcsEpgScrapper : EpgScrapper {
+open class OcsEpgScrapper : EpgScrapper {
     private val lastEpgs = Collections.synchronizedMap(HashMap<Channel, EpgInfo>())
     override fun scrapeEpg(filterChannel: Predicate<Channel>, listener: EpgInfoScrappedListener) {
         lastEpgs.clear()
@@ -98,7 +98,7 @@ class OcsEpgScrapper : EpgScrapper {
         }
     }
 
-    private fun parseDetails(uri: String, info: EpgInfo) {
+    open fun parseDetails(uri: String, info: EpgInfo) {
         try {
             parseDetails(Jsoup.connect(uri).get(), info)
         } catch (e: HttpStatusException) {
