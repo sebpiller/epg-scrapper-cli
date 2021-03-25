@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 @DisplayName("OCS Scrapper integration")
-@EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
+//@EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
 class OcsEpgScrapperIntegrationTest extends IntegrationTest {
     private static final Logger LOG = LoggerFactory.getLogger(OcsEpgScrapperIntegrationTest.class);
 

@@ -11,7 +11,7 @@ node {
 
   stage ('Test') {
     withMaven {
-      sh "mvn test -DskipITs"
+      sh "mvn verify -DskipITs"
     }
   }
 

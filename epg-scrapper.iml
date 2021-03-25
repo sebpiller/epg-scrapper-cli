@@ -3,6 +3,8 @@
   <component name="AutoImportedSourceRoots">
     <option name="directories">
       <list>
+        <option value="C:\dev\workspace\epg-scrapper/src/it/java" />
+        <option value="C:\dev\workspace\epg-scrapper/src/it/kotlin" />
         <option value="C:\dev\workspace\epg-scrapper/src/main/java" />
         <option value="C:\dev\workspace\epg-scrapper/src/main/kotlin" />
         <option value="C:\dev\workspace\epg-scrapper/src/test/java" />
