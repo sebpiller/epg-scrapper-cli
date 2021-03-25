@@ -1,36 +1,8 @@
-pipeline {
-    agent {
-        docker {
-            image 'maven'
-        }
-    }
-
-    options {
-        skipStagesAfterUnstable()
-    }
-
-    stages {
-        stage('Build') {
-            withMaven {
-                sh "mvn clean verify"
-            }
-        }
-
-        stage('Test') {
-            steps {
-                sh 'mvn test'
-            }
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml'
-                }
-            }
-        }
-
-        stage('Deliver') {
-            steps {
-                sh './jenkins/scripts/deliver.sh'
-            }
-        }
-    }
+node {
+  stage ('Build') {
+    git url: 'http://git.home/spiller/epg-scrapper.git'
+    withMaven {
+      sh "mvn clean verify"
+    } // withMaven will discover the generated Maven artifacts, JUnit Surefire & FailSafe reports and FindBugs reports
+  }
 }
