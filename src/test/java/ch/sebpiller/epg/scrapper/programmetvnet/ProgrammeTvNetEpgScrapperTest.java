@@ -21,7 +21,12 @@ class ProgrammeTvNetEpgScrapperTest {
     void testScrapeFromLocal() throws IOException {
         Document doc = Jsoup.parse(getClass().getResourceAsStream("/sample_programmetvnet_mangas.html"), StandardCharsets.UTF_8.name(), "");
 
-        ProgrammeTvNetEpgScrapper scrapper = new ProgrammeTvNetEpgScrapper();
+        ProgrammeTvNetEpgScrapper scrapper = new ProgrammeTvNetEpgScrapper() {
+            @Override
+            void parseDetails(String uri, EpgInfo info) {
+                // disabled
+            }
+        };
 
         // do not scrape details
         scrapper.scrapeDocument(doc, e -> {

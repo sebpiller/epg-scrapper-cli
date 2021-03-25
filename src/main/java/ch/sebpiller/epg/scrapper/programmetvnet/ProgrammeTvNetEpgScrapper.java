@@ -215,7 +215,7 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
     }
 
 
-    private void parseDetails(String uri, EpgInfo info) {
+    void parseDetails(String uri, EpgInfo info) {
         try {
             parseDetails(Jsoup.connect(uri).get(), info);
         } catch (HttpStatusException e) {

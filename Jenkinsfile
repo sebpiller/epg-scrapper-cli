@@ -47,20 +47,8 @@ stages
      }
    }
 
-  stage('Display Available Updates')
-   {
-    steps
-     {
-      script
-       {
-          sh 'echo "PROPERTIES UPDATES" && mvn --batch-mode org.codehaus.mojo:versions-maven-plugin:display-property-updates'
-          sh 'echo "DEPENDENCIES UPDATES" && mvn --batch-mode org.codehaus.mojo:versions-maven-plugin:display-dependency-updates'
-          sh 'echo "PLUGINS UPDATES" && mvn --batch-mode org.codehaus.mojo:versions-maven-plugin:display-plugin-updates'
-       }
-     }
-   }
 
-  stage('UnitTests')
+  stage('Unit Tests')
    {
     steps
      {
@@ -77,6 +65,17 @@ stages
        }
      }
    }
+
+ stage('Integration tests')
+  {
+   steps
+    {
+     script
+      {
+         sh 'mvn --batch-mode failsafe:integration-test failsafe:verify -X'
+      }
+    }
+  }
 
   stage('Sanity check')
    {
@@ -111,6 +110,19 @@ stages
      }
    }
 
+   stage('Check for updates')
+      {
+       steps
+        {
+         script
+          {
+             sh 'mvn --batch-mode org.codehaus.mojo:versions-maven-plugin:display-property-updates'
+             sh 'mvn --batch-mode org.codehaus.mojo:versions-maven-plugin:display-dependency-updates'
+             sh 'mvn --batch-mode org.codehaus.mojo:versions-maven-plugin:display-plugin-updates'
+          }
+        }
+      }
+
   stage('Documentation')
    {
     steps
@@ -129,42 +141,6 @@ stages
      }
    }
 
-/*
-  stage('Tomcat Deploy Test')
-   {
-    steps
-     {
-      script
-       {
-        if (isUnix())
-         {
-          // todo
-         }
-        else
-         {
-          bat returnStatus: true, script: 'sc stop Tomcat8'
-          sleep(time:30, unit:"SECONDS")
-          bat returnStatus: true, script: 'C:\\scripts\\clean.bat'
-          bat returnStatus: true, script: 'robocopy "target" "C:\\Program Files\\Apache Software Foundation\\Tomcat 9.0\\webapps" Test.war'
-          bat 'sc start Tomcat8'
-          sleep(time:30, unit:"SECONDS")
-         }
-       }
-     }
-   }*/
-
-  stage('Integration tests')
-   {
-    steps
-     {
-      script
-       {
-          sh 'mvn --batch-mode failsafe:integration-test failsafe:verify -X'
-       }
-     }
-   }
-
-
   stage('Deploy to Distribution Management')
    {
     steps
@@ -176,6 +152,29 @@ stages
      }
    }
 
+   /*
+     stage('Tomcat Deploy Test')
+      {
+       steps
+        {
+         script
+          {
+           if (isUnix())
+            {
+             // todo
+            }
+           else
+            {
+             bat returnStatus: true, script: 'sc stop Tomcat8'
+             sleep(time:30, unit:"SECONDS")
+             bat returnStatus: true, script: 'C:\\scripts\\clean.bat'
+             bat returnStatus: true, script: 'robocopy "target" "C:\\Program Files\\Apache Software Foundation\\Tomcat 9.0\\webapps" Test.war'
+             bat 'sc start Tomcat8'
+             sleep(time:30, unit:"SECONDS")
+            }
+          }
+        }
+      }*/
  }
 
 }

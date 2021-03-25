@@ -230,7 +230,7 @@ public class RtsEpgScrapper implements EpgScrapper {
         }
     }
 
-    private void parseDetails(String detailUriId, EpgInfo info) {
+    void parseDetails(String detailUriId, EpgInfo info) {
         Document doc;
         try {
             doc = Jsoup.connect(DETAILS_URL + '/' + detailUriId).get();
