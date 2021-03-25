@@ -11,11 +11,11 @@ node {
 
   stage ('Test') {
     withMaven {
-      sh "mvn test -DskipIntegrationTests=true"
+      sh "mvn test -DskipITs"
     }
   }
 
-  stage ('Intg-Test') {
+  stage ('TestIntg') {
     withMaven {
       sh "mvn failsafe:integration-test failsafe:verify"
     }
