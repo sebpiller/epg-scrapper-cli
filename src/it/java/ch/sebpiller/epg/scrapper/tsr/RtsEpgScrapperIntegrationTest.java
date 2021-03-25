@@ -1,6 +1,7 @@
 package ch.sebpiller.epg.scrapper.tsr;
 
 import ch.sebpiller.epg.EpgInfo;
+import ch.sebpiller.epg.scrapper.IntegrationTest;
 import org.jsoup.Jsoup;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,7 @@ import java.util.List;
 
 @DisplayName("RTS Scrapper integration")
 @EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
-class RtsEpgScrapperIntegrationTest {
+class RtsEpgScrapperIntegrationTest extends IntegrationTest {
     private static final Logger LOG = LoggerFactory.getLogger(RtsEpgScrapperIntegrationTest.class);
 
     @Test

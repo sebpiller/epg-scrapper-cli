@@ -1,20 +1,27 @@
 node {
+  stage ('Fetch source') {
+      git url: 'http://git.home/spiller/epg-scrapper.git'
+  }
+
   stage ('Build') {
-    git url: 'http://git.home/spiller/epg-scrapper.git'
     withMaven {
       sh "mvn clean compile -DskipTests"
     }
   }
 
   stage ('Test') {
-    git url: 'http://git.home/spiller/epg-scrapper.git'
     withMaven {
       sh "mvn test"
     }
   }
 
+  stage ('Intg-Test') {
+    withMaven {
+      sh "mvn integration-test"
+    }
+  }
+
   stage ('Deploy') {
-    git url: 'http://git.home/spiller/epg-scrapper.git'
     withMaven {
       sh "mvn deploy"
     }

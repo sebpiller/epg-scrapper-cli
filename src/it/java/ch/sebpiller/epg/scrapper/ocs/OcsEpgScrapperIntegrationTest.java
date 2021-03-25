@@ -1,6 +1,7 @@
 package ch.sebpiller.epg.scrapper.ocs;
 
 import ch.sebpiller.epg.EpgInfo;
+import ch.sebpiller.epg.scrapper.IntegrationTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
@@ -15,9 +16,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
-@EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
 @DisplayName("OCS Scrapper integration")
-class OcsEpgScrapperIntegrationTest {
+@EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
+class OcsEpgScrapperIntegrationTest extends IntegrationTest {
     private static final Logger LOG = LoggerFactory.getLogger(OcsEpgScrapperIntegrationTest.class);
 
     @Test

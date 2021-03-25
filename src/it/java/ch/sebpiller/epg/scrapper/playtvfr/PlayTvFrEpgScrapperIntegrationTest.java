@@ -1,6 +1,7 @@
-package ch.sebpiller.epg.scrapper.programmetvnet;
+package ch.sebpiller.epg.scrapper.playtvfr;
 
 import ch.sebpiller.epg.EpgInfo;
+import ch.sebpiller.epg.scrapper.IntegrationTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
@@ -13,17 +14,17 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-@DisplayName("ProgrammeTV Net Scrapper integration")
+@DisplayName("PlayTV FR Scrapper integration")
 @EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
-class ProgrammeTvNetEpgScrapperIntegrationTest {
-    private static final Logger LOG = LoggerFactory.getLogger(ProgrammeTvNetEpgScrapperIntegrationTest.class);
+class PlayTvFrEpgScrapperIntegrationTest extends IntegrationTest {
+    private static final Logger LOG = LoggerFactory.getLogger(PlayTvFrEpgScrapperIntegrationTest.class);
 
     @Test
-    void testScrapeFromProgrammeTvNet() throws IOException {
+    void testScrapeFromPlayTvFr() throws IOException {
         List<EpgInfo> allInfos = new ArrayList<>(25_000);
 
         long start = System.currentTimeMillis();
-        ProgrammeTvNetEpgScrapper scrapper = new ProgrammeTvNetEpgScrapper();
+        PlayTvFrEpgScrapper scrapper = new PlayTvFrEpgScrapper();
         scrapper.scrapeEpg(c -> true, e -> {
             allInfos.add(e);
 
@@ -36,7 +37,7 @@ class ProgrammeTvNetEpgScrapperIntegrationTest {
 
         allInfos.forEach(System.out::println);
 
-        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("all_programmetvnet_epg_info.data"));
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("all_playtvfr_epg_info.data"));
         oos.writeObject(allInfos);
         oos.close();
     }

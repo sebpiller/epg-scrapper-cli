@@ -1,6 +1,8 @@
-package ch.sebpiller.epg.scrapper.playtvfr;
+package ch.sebpiller.epg.scrapper.telecablesatfr;
 
 import ch.sebpiller.epg.EpgInfo;
+import ch.sebpiller.epg.scrapper.IntegrationTest;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
@@ -13,17 +15,20 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-@DisplayName("PlayTV FR Scrapper integration")
+@DisplayName("Telecable Sat FR Scrapper integration")
+@Disabled("TelecableSatFrScrapper is deprecated")
 @EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
-class PlayTvFrEpgScrapperIntegrationTest {
-    private static final Logger LOG = LoggerFactory.getLogger(PlayTvFrEpgScrapperIntegrationTest.class);
+class TelecableSatFrScrapperIntegrationTest extends IntegrationTest {
+    private static final Logger LOG = LoggerFactory.getLogger(TelecableSatFrScrapperIntegrationTest.class);
 
+    // TODO implement
+    //@Ignore("tobe implemented")
     @Test
-    void testScrapeFromPlayTvFr() throws IOException {
+    void testScrapeFromTelecableSatFr() throws IOException {
         List<EpgInfo> allInfos = new ArrayList<>(25_000);
 
         long start = System.currentTimeMillis();
-        PlayTvFrEpgScrapper scrapper = new PlayTvFrEpgScrapper();
+        TelecableSatFrScrapper scrapper = new TelecableSatFrScrapper();
         scrapper.scrapeEpg(c -> true, e -> {
             allInfos.add(e);
 
@@ -36,7 +41,7 @@ class PlayTvFrEpgScrapperIntegrationTest {
 
         allInfos.forEach(System.out::println);
 
-        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("all_playtvfr_epg_info.data"));
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("all_telecablesatfr_epg_info.data"));
         oos.writeObject(allInfos);
         oos.close();
     }
