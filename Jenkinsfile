@@ -5,25 +5,25 @@ node {
 
   stage ('Build') {
     withMaven {
-      sh "mvn clean compile -DskipTests"
+      sh "mvn clean package -DskipTests"
     }
   }
 
   stage ('Test') {
     withMaven {
-      sh "mvn test"
+      sh "mvn surefire:test"
     }
   }
 
   stage ('Intg-Test') {
     withMaven {
-      sh "mvn integration-test"
+      sh "mvn failsafe:integration-test failsafe:verify"
     }
   }
 
   stage ('Deploy') {
     withMaven {
-      sh "mvn deploy"
+      sh "mvn deploy:deploy"
     }
   }
 
