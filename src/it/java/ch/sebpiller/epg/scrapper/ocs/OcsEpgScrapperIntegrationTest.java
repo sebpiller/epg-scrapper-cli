@@ -1,6 +1,7 @@
 package ch.sebpiller.epg.scrapper.ocs;
 
 import ch.sebpiller.epg.EpgInfo;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.slf4j.Logger;
