@@ -24,6 +24,9 @@
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <skipUTs>false</skipUTs>
         <failIfNoTests>true</failIfNoTests>
+
+        <surefire.jacoco.args>will_contains_jacoco_env_for_surefire</surefire.jacoco.args>
+        <failsafe.jacoco.args>will_contains_jacoco_env_for_failsafe</failsafe.jacoco.args>
     </properties>
 
     <developers>
@@ -126,6 +129,36 @@
 
     </dependencies>
 
+    <profiles>
+        <!-- Jenkins by default defines a property BUILD_NUMBER which is used to enable the profile. -->
+        <profile>
+            <id>jenkins</id>
+            <activation>
+<!--                <property>-->
+<!--                    <name>env.BUILD_NUMBER</name>-->
+<!--                </property>-->
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+            </build>
+            <reporting>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <reportSets>
+                            <reportSet>
+                                <reports>
+                                    <report>report</report>
+                                </reports>
+                            </reportSet>
+                        </reportSets>
+                    </plugin>
+                </plugins>
+            </reporting>
+
+        </profile>
+    </profiles>
 
     <build>
         <resources>
@@ -147,6 +180,122 @@
 
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-project-info-reports-plugin</artifactId>
+                    <version>3.1.1</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.8.6</version>
+                    <executions>
+                        <!-- Surefire -->
+                        <execution>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                            <configuration>
+                                <destFile>${project.build.directory}/UT-coverage.jacoco</destFile>
+                                <propertyName>surefire.jacoco.args</propertyName>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>after-unit-test-execution</id>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                            <configuration>
+                                <dataFile>${project.build.directory}/UT-coverage.jacoco</dataFile>
+                            </configuration>
+                        </execution>
+
+                        <!-- Failsafe -->
+                        <execution>
+                            <id>before-integration-test-execution</id>
+                            <phase>pre-integration-test</phase>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                            <configuration>
+                                <destFile>${project.build.directory}/IT-coverage.jacoco</destFile>
+                                <propertyName>failsafe.jacoco.args</propertyName>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>after-integration-test-execution</id>
+                            <phase>post-integration-test</phase>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                            <configuration>
+                                <dataFile>${project.build.directory}/IT-coverage.jacoco</dataFile>
+                                <outputDirectory>${project.reporting.outputDirectory}</outputDirectory>
+                            </configuration>
+                        </execution>
+
+                        <!-- Merged test coverage report -->
+                        <execution>
+                            <id>merge-unit-and-integration</id>
+                            <phase>post-integration-test</phase>
+                            <goals>
+                                <goal>merge</goal>
+                            </goals>
+                            <configuration>
+                                <fileSets>
+                                    <fileSet>
+                                        <directory>${project.build.directory}</directory>
+                                        <includes>
+                                            <include>*.jacoco</include>
+                                        </includes>
+                                    </fileSet>
+                                </fileSets>
+                                <destFile>${project.build.directory}/MERGED-coverage.jacoco</destFile>
+                            </configuration>
+                        </execution>
+
+                        <execution>
+                            <id>create-merged-report</id>
+                            <phase>post-integration-test</phase>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                            <configuration>
+                                <dataFile>${project.build.directory}/MERGED-coverage.jacoco</dataFile>
+                                <outputDirectory>${project.reporting.outputDirectory}</outputDirectory>
+                            </configuration>
+                        </execution>
+
+                        <!-- Code coverage threshold -->
+                        <execution>
+                            <id>check</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                            <configuration>
+                                <rules>
+                                    <rule>
+                                        <element>CLASS</element>
+                                        <excludes>
+                                            <exclude>*Test</exclude>
+                                        </excludes>
+                                        <limits>
+                                            <limit>
+                                                <counter>LINE</counter>
+                                                <value>COVEREDRATIO</value>
+                                                <minimum>90%</minimum>
+                                            </limit>
+                                        </limits>
+                                    </rule>
+                                </rules>
+                                <dataFile>${project.build.directory}/MERGED-coverage.jacoco</dataFile>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
                 <plugin>
                     <artifactId>maven-assembly-plugin</artifactId>
                     <version>3.3.0</version>
@@ -251,6 +400,50 @@
                 </plugin>
 
                 <plugin>
+                    <groupId>org.jetbrains.kotlin</groupId>
+                    <artifactId>kotlin-maven-plugin</artifactId>
+                    <version>1.4.31</version>
+                    <executions>
+                        <execution>
+                            <id>compile</id>
+                            <goals>
+                                <goal>compile</goal>
+                            </goals>
+                            <configuration>
+                                <sourceDirs>
+                                    <sourceDir>${project.basedir}/src/main/kotlin</sourceDir>
+                                    <sourceDir>${project.basedir}/src/main/java</sourceDir>
+                                </sourceDirs>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>test-compile</id>
+                            <goals>
+                                <goal>test-compile</goal>
+                            </goals>
+                            <configuration>
+                                <sourceDirs>
+                                    <sourceDir>${project.basedir}/src/test/kotlin</sourceDir>
+                                    <sourceDir>${project.basedir}/src/test/java</sourceDir>
+                                </sourceDirs>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>integration-test-compile</id>
+                            <goals>
+                                <goal>test-compile</goal>
+                            </goals>
+                            <configuration>
+                                <sourceDirs>
+                                    <sourceDir>${project.basedir}/src/it/kotlin</sourceDir>
+                                    <sourceDir>${project.basedir}/src/it/java</sourceDir>
+                                </sourceDirs>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
                     <version>3.2.0</version>
@@ -290,8 +483,10 @@
                     <version>3.0.0-M5</version>
 
                     <configuration>
+                        <argLine>${surefire.jacoco.args}</argLine>
                         <skipTests>${skipUTs}</skipTests>
                         <excludes>
+                            <!-- Do not process integration tests with surefire. Failsafe will do the job -->
                             <exclude>**/*IntegrationTest.java</exclude>
                         </excludes>
                     </configuration>
@@ -306,6 +501,7 @@
                         <includes>
                             <include>**/*IntegrationTest.java</include>
                         </includes>
+                        <argLine>${failsafe.jacoco.args}</argLine>
                     </configuration>
                     <executions>
                         <execution>
@@ -339,47 +535,13 @@
             </plugin>
 
             <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+            </plugin>
+
+            <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
-                <version>1.4.31</version>
-                <executions>
-                    <execution>
-                        <id>compile</id>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirs>
-                                <sourceDir>${project.basedir}/src/main/kotlin</sourceDir>
-                                <sourceDir>${project.basedir}/src/main/java</sourceDir>
-                            </sourceDirs>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>test-compile</id>
-                        <goals>
-                            <goal>test-compile</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirs>
-                                <sourceDir>${project.basedir}/src/test/kotlin</sourceDir>
-                                <sourceDir>${project.basedir}/src/test/java</sourceDir>
-                            </sourceDirs>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>integration-test-compile</id>
-                        <goals>
-                            <goal>test-compile</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirs>
-                                <sourceDir>${project.basedir}/src/it/kotlin</sourceDir>
-                                <sourceDir>${project.basedir}/src/it/java</sourceDir>
-                            </sourceDirs>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
 
             <plugin>

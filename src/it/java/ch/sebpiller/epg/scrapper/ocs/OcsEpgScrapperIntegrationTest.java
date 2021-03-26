@@ -1,7 +1,6 @@
 package ch.sebpiller.epg.scrapper.ocs;
 
 import ch.sebpiller.epg.EpgInfo;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.slf4j.Logger;
@@ -14,9 +13,8 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 
-@EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
+//@EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
 class OcsEpgScrapperIntegrationTest {
     private static final Logger LOG = LoggerFactory.getLogger(OcsEpgScrapperIntegrationTest.class);
 

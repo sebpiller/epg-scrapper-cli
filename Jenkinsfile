@@ -88,37 +88,17 @@ stages
      }
    }
 
-  stage('Packaging')
-   {
-    steps
-     {
-      script
-       {
-          sh 'mvn --batch-mode package -DskipITs -DskipUTs'
-       }
-     }
-   }
-
-  stage('Install')
-   {
-    steps
-     {
-      script
-       {
-          sh 'mvn --batch-mode install -DskipITs -DskipUTs'
-       }
-     }
-   }
-
    stage('Check for updates')
       {
        steps
         {
          script
           {
-             sh 'mvn --batch-mode org.codehaus.mojo:versions-maven-plugin:display-property-updates'
-             sh 'mvn --batch-mode org.codehaus.mojo:versions-maven-plugin:display-dependency-updates'
-             sh 'mvn --batch-mode org.codehaus.mojo:versions-maven-plugin:display-plugin-updates'
+             sh """
+               mvn --batch-mode org.codehaus.mojo:versions-maven-plugin:display-property-updates
+               mvn --batch-mode org.codehaus.mojo:versions-maven-plugin:display-dependency-updates
+               mvn --batch-mode org.codehaus.mojo:versions-maven-plugin:display-plugin-updates
+             """
           }
         }
       }
@@ -129,7 +109,7 @@ stages
      {
       script
        {
-         sh 'mvn --batch-mode site -DskipITs -DskipUTs'
+         sh 'mvn --batch-mode site -DskipUTs -DskipITs'
        }
      }
     post
@@ -141,13 +121,13 @@ stages
      }
    }
 
-  stage('Deploy to Distribution Management')
+  stage('Install/Deploy to Distribution Management')
    {
     steps
      {
       script
        {
-          sh 'mvn --batch-mode deploy -DskipITs -DskipUTs'
+          sh 'mvn --batch-mode deploy -DskipUTs -DskipITs'
        }
      }
    }
