@@ -72,7 +72,7 @@ stages
     {
      script
       {
-         sh 'mvn --batch-mode failsafe:integration-test failsafe:verify -X'
+         sh 'mvn --batch-mode failsafe:integration-test@integration-test failsafe:verify@verify-it -X'
       }
     }
   }
