@@ -94,7 +94,7 @@ stages
      {
       script
        {
-          sh 'mvn --batch-mode jar:jar'
+          sh 'mvn --batch-mode package -DskipITs -DskipUTs'
        }
      }
    }
@@ -129,7 +129,7 @@ stages
      {
       script
        {
-         sh 'mvn --batch-mode site'
+         sh 'mvn --batch-mode site -DskipITs -DskipUTs'
        }
      }
     post
@@ -147,7 +147,7 @@ stages
      {
       script
        {
-          sh 'mvn --batch-mode deploy'
+          sh 'mvn --batch-mode deploy -DskipITs -DskipUTs'
        }
      }
    }
