@@ -1,6 +1,7 @@
 package ch.sebpiller.epg.scrapper.tvsearchch;
 
 
+import ch.sebpiller.epg.Channel;
 import ch.sebpiller.epg.scrapper.IntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,7 +20,7 @@ class TvSearchChIntegrationTest extends IntegrationTest {
 
     @Test
     void test_tvsearchch() {
-        test.scrapeEpg(x -> true, scrapped -> {
+        test.scrapeEpg(x -> x == Channel.ROUGETV, scrapped -> {
             System.out.println(scrapped);
             return true;
         });

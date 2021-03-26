@@ -1,5 +1,6 @@
 package ch.sebpiller.epg.scrapper.tsr;
 
+import ch.sebpiller.epg.Channel;
 import ch.sebpiller.epg.EpgInfo;
 import ch.sebpiller.epg.scrapper.IntegrationTest;
 import org.jsoup.Jsoup;
@@ -40,7 +41,7 @@ class RtsEpgScrapperIntegrationTest extends IntegrationTest {
 
         long start = System.currentTimeMillis();
         RtsEpgScrapper scrapper = new RtsEpgScrapper();
-        scrapper.scrapeEpg(c -> true, e -> {
+        scrapper.scrapeEpg(c -> c == Channel.RTS1, e -> {
             allInfos.add(e);
 
             if (allInfos.size() % 100 == 0) {

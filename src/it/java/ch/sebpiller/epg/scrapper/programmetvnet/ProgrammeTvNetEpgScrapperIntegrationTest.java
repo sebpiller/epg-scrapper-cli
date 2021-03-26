@@ -1,5 +1,6 @@
 package ch.sebpiller.epg.scrapper.programmetvnet;
 
+import ch.sebpiller.epg.Channel;
 import ch.sebpiller.epg.EpgInfo;
 import org.junit.jupiter.api.Disabled;
 import ch.sebpiller.epg.scrapper.IntegrationTest;
@@ -26,7 +27,7 @@ class ProgrammeTvNetEpgScrapperIntegrationTest extends IntegrationTest {
 
         long start = System.currentTimeMillis();
         ProgrammeTvNetEpgScrapper scrapper = new ProgrammeTvNetEpgScrapper();
-        scrapper.scrapeEpg(c -> true, e -> {
+        scrapper.scrapeEpg(c -> c == Channel.MANGAS, e -> {
             allInfos.add(e);
 
             if (allInfos.size() % 100 == 0) {
