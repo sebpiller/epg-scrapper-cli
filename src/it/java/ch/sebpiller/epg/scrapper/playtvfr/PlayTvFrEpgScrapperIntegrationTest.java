@@ -16,8 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @DisplayName("PlayTV FR Scrapper integration")
-@Disabled("OCS disabled for Jenkins DEBUGGING")
+@Disabled("PlayTV FR is deprecated")
 @EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
+@Deprecated
 class PlayTvFrEpgScrapperIntegrationTest extends IntegrationTest {
     private static final Logger LOG = LoggerFactory.getLogger(PlayTvFrEpgScrapperIntegrationTest.class);
 
@@ -38,9 +39,9 @@ class PlayTvFrEpgScrapperIntegrationTest extends IntegrationTest {
         });
 
         allInfos.forEach(System.out::println);
-
+/*
         ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("all_playtvfr_epg_info.data"));
         oos.writeObject(allInfos);
-        oos.close();
+        oos.close();*/
     }
 }

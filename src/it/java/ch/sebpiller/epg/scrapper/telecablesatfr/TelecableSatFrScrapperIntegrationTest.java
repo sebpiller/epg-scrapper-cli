@@ -18,6 +18,7 @@ import java.util.List;
 @DisplayName("Telecable Sat FR Scrapper integration")
 @Disabled("TelecableSatFrScrapper is deprecated")
 @EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
+@Deprecated
 class TelecableSatFrScrapperIntegrationTest extends IntegrationTest {
     private static final Logger LOG = LoggerFactory.getLogger(TelecableSatFrScrapperIntegrationTest.class);
 
@@ -41,8 +42,8 @@ class TelecableSatFrScrapperIntegrationTest extends IntegrationTest {
 
         allInfos.forEach(System.out::println);
 
-        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("all_telecablesatfr_epg_info.data"));
+        /*ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("all_telecablesatfr_epg_info.data"));
         oos.writeObject(allInfos);
-        oos.close();
+        oos.close();*/
     }
 }

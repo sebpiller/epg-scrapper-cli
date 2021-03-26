@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @DisplayName("RTS Scrapper integration")
-@Disabled("TvSearchChIntegrationTest disabled for Jenkins DEBUGGING")
 @EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
 class RtsEpgScrapperIntegrationTest extends IntegrationTest {
     private static final Logger LOG = LoggerFactory.getLogger(RtsEpgScrapperIntegrationTest.class);
@@ -54,8 +53,8 @@ class RtsEpgScrapperIntegrationTest extends IntegrationTest {
 
         allInfos.forEach(System.out::println);
 
-        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("all_epg_info.data"));
+        /*ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("all_epg_info.data"));
         oos.writeObject(allInfos);
-        oos.close();
+        oos.close();*/
     }
 }

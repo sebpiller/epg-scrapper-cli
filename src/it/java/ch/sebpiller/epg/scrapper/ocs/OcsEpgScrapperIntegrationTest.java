@@ -2,6 +2,7 @@ package ch.sebpiller.epg.scrapper.ocs;
 
 import ch.sebpiller.epg.Channel;
 import ch.sebpiller.epg.EpgInfo;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.slf4j.Logger;
@@ -15,7 +16,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
-//@EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
+@DisplayName("OCS Scrapper integration")
+@EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
 class OcsEpgScrapperIntegrationTest {
     private static final Logger LOG = LoggerFactory.getLogger(OcsEpgScrapperIntegrationTest.class);
 
@@ -38,8 +40,8 @@ class OcsEpgScrapperIntegrationTest {
 
         allInfos.forEach(System.out::println);
 
-        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("all_ocs_epg_info.data"));
+        /*ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("all_ocs_epg_info.data"));
         oos.writeObject(allInfos);
-        oos.close();
+        oos.close();*/
     }
 }
