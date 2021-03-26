@@ -534,6 +534,9 @@
                     <version>3.0.0-M5</version>
 
                     <configuration>
+                        <!-- beware of timeouts -->
+                        <forkedProcessTimeoutInSeconds>0</forkedProcessTimeoutInSeconds>
+                        <forkedProcessExitTimeoutInSeconds>0</forkedProcessExitTimeoutInSeconds>
                         <testSourceDirectory>${project.basedir}/src/it/java</testSourceDirectory>
                         <includes>
                             <include>**/*IntegrationTest.java</include>

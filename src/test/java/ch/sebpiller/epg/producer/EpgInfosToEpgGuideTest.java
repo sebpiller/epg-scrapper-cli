@@ -1,7 +1,10 @@
 package ch.sebpiller.epg.producer;
 
+import ch.sebpiller.epg.Audience;
+import ch.sebpiller.epg.Channel;
 import ch.sebpiller.epg.EpgInfo;
 import ch.sebpiller.epg.scrapper.EpgScrapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -12,9 +15,14 @@ import org.w3c.dom.Element;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,42 +31,33 @@ import java.util.List;
 class EpgInfosToEpgGuideTest {
     private static final Logger LOG = LoggerFactory.getLogger(EpgInfosToEpgGuideTest.class);
 
-    @Test
+    private List<EpgInfo> infos;
+
+    @BeforeEach
     void exportSerializedObjectsToEpgGuide() throws Exception {
-        List<EpgInfo> infos = new ArrayList<>();
-       /* ObjectInputStream ois = new ObjectInputStream(getClass().getResourceAsStream("/all_epg_info.data"));
-        List<EpgInfo> infos = (List<EpgInfo>) ois.readObject();
-        ois.close();
+        infos = new ArrayList<>();
 
-        ois = new ObjectInputStream(getClass().getResourceAsStream("/all_ocs_epg_info.data"));
-        List<EpgInfo> infos2 = (List<EpgInfo>) ois.readObject();
-        ois.close();
+        EpgInfo info = new EpgInfo(Channel.RTS1);
+        info.setCategory("Youth");
+        info.setTitle("The title");
+        info.setSubtitle("The subtitle");
+        info.setTimeStart(ZonedDateTime.now());
+        info.setTimeStop(ZonedDateTime.now().plus(2, ChronoUnit.HOURS));
+        info.setDescription("The description");
+        info.setAudience(Audience.ALL);
+        info.setActors(Arrays.asList("Tom Hanks", "Jennifer Lopez", "Jésus-Christ"));
+        info.setDirectors(Arrays.asList("Quentin Tarantino"));
+        info.setProducers(Arrays.asList("Bill Cosby"));
+        info.setScenarists(Arrays.asList("John Malkovich"));
+        info.setEpisode("S01E04");
 
-        infos.addAll(infos2);
-
-        ois = new ObjectInputStream(getClass().getResourceAsStream("/all_programmetvnet_epg_info.data"));
-        List<EpgInfo> infos3 = (List<EpgInfo>) ois.readObject();
-        ois.close();
-
-        infos.addAll(infos3);
-
-        ois = new ObjectInputStream(getClass().getResourceAsStream("/all_playtvfr_epg_info.data"));
-        List<EpgInfo> infos4 = (List<EpgInfo>) ois.readObject();
-        ois.close();
-
-        infos.addAll(infos4);*/
-
-        exportUsingSax(infos);
-
-        /*Document doc = buildDocumentFromEpgInfo(infos);
-        Transformer t = TransformerFactory.newInstance().newTransformer();
-        t.setOutputProperty(OutputKeys.INDENT, "yes");
-        t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-        t.transform(new DOMSource(doc), new StreamResult(System.out));
-        t.transform(new DOMSource(doc), new StreamResult(new FileOutputStream("/home/spiller/tv/config/data/epg.xml")));*/
+        infos.add(info);
     }
 
-    private Document buildDocumentFromEpgInfo(List<EpgInfo> infos) throws ParserConfigurationException {
+    private int i;
+
+    @Test
+    void exportUsingDom() throws Exception {
         DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document doc = db.newDocument();
 
@@ -70,16 +69,18 @@ class EpgInfosToEpgGuideTest {
         root.setAttribute("generator-info-url", "https://home.sebpiller.ch;me@sebpiller.ch");
         doc.appendChild(root);
 
-        XmlTvEpgProducer epgInfoDumper = new XmlTvEpgProducer();
-        epgInfoDumper.dumpChannels(doc, root);
-        infos.forEach(epgInfo -> epgInfoDumper.dumpInfo(doc, root, epgInfo));
+        XmlTvEpgProducer producer = new XmlTvEpgProducer();
+        producer.dumpChannels(doc, root);
+        infos.forEach(epgInfo -> producer.dumpInfo(doc, root, epgInfo));
 
-        return doc;
+        Transformer t = TransformerFactory.newInstance().newTransformer();
+        t.setOutputProperty(OutputKeys.INDENT, "yes");
+        t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+        t.transform(new DOMSource(doc), new StreamResult(System.out));
     }
 
-    private int i;
-
-    private void exportUsingSax(List<EpgInfo> infos) {
+    @Test
+    void exportUsingSax() {
         i = 0;
 
         // Fake scrappers using a List<EpgInfo> as source
