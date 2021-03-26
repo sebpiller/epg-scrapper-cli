@@ -75,33 +75,14 @@ stages
          sh 'mvn --batch-mode verify -DskipUTs'
       }
     }
-  }
-
-  stage('Sanity checks')
-   {
-    steps
+    post
      {
-      script
+      always
        {
-          sh 'mvn --batch-mode checkstyle:checkstyle pmd:pmd pmd:cpd com.github.spotbugs:spotbugs-maven-plugin:spotbugs'
+        junit testResults: 'target/failsafe-reports/*.xml'
        }
      }
-   }
-
-   stage('Check for updates')
-      {
-       steps
-        {
-         script
-          {
-             sh """
-               mvn --batch-mode org.codehaus.mojo:versions-maven-plugin:display-property-updates
-               mvn --batch-mode org.codehaus.mojo:versions-maven-plugin:display-dependency-updates
-               mvn --batch-mode org.codehaus.mojo:versions-maven-plugin:display-plugin-updates
-             """
-          }
-        }
-      }
+  }
 
   stage('Documentation')
    {
@@ -121,7 +102,7 @@ stages
      }
    }
 
-  stage('Install/Deploy to Distribution Management')
+  stage('Deploy artifacts')
    {
     steps
      {

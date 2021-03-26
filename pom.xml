@@ -86,12 +86,12 @@
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>6.1.6.Final</version>
+            <version>6.2.0.Final</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator-annotation-processor</artifactId>
-            <version>6.1.6.Final</version>
+            <version>6.2.0.Final</version>
         </dependency>
         <dependency>
             <groupId>javax.el</groupId>
@@ -124,7 +124,7 @@
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
-            <version>1.4.30</version>
+            <version>1.4.32</version>
         </dependency>
 
     </dependencies>
@@ -198,6 +198,14 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <version>3.0.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>3.1.0</version>
+                </plugin>
+                <plugin>
                     <artifactId>maven-install-plugin</artifactId>
                     <version>3.0.0-M1</version>
                 </plugin>
@@ -213,7 +221,7 @@
                 <!-- deploy 2.8.x required to have distribution management configured in settings.xml instead of pom -->
                 <plugin>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>2.8.2</version>
+                    <version>3.0.0-M1</version>
                 </plugin>
 
                 <plugin>
@@ -247,6 +255,18 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
                     <version>3.1.1</version>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>3.1.2</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>8.32</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
 
                 <plugin>
@@ -439,7 +459,7 @@
                 <plugin>
                     <groupId>org.jetbrains.kotlin</groupId>
                     <artifactId>kotlin-maven-plugin</artifactId>
-                    <version>1.4.31</version>
+                    <version>1.4.32</version>
                     <executions>
                         <execution>
                             <id>compile</id>
@@ -520,7 +540,7 @@
                     <version>3.0.0-M5</version>
 
                     <configuration>
-                        <argLine>-Xmx2g @{surefire.jacoco.args}</argLine>
+                        <argLine>@{surefire.jacoco.args}</argLine>
                         <skipTests>${skipUTs}</skipTests>
                         <excludes>
                             <!-- Do not process integration tests with surefire. Failsafe will do the job -->
@@ -541,7 +561,7 @@
                         <includes>
                             <include>**/*IntegrationTest.java</include>
                         </includes>
-                        <argLine>-Xmx2g @{failsafe.jacoco.args}</argLine>
+                        <argLine>@{failsafe.jacoco.args}</argLine>
                     </configuration>
                     <executions>
                         <execution>
@@ -579,24 +599,24 @@
                     </executions>
                 </plugin>
 
-<!--                <plugin>-->
-<!--                    <groupId>com.coderplus.maven.plugins</groupId>-->
-<!--                    <artifactId>copy-rename-maven-plugin</artifactId>-->
-<!--                    <version>1.0.1</version>-->
-<!--                    <executions>-->
-<!--                        <execution>-->
-<!--                            <id>rename-site-jar-to-zip</id>-->
-<!--                            <phase>verify</phase>-->
-<!--                            <goals>-->
-<!--                                <goal>rename</goal>-->
-<!--                            </goals>-->
-<!--                            <configuration>-->
-<!--                                <sourceFile>${project.build.directory}/${project.build.finalName}-site.jar</sourceFile>-->
-<!--                                <destinationFile>${project.build.directory}/${project.build.finalName}-site.zip</destinationFile>-->
-<!--                            </configuration>-->
-<!--                        </execution>-->
-<!--                    </executions>-->
-<!--                </plugin>-->
+                <!--                <plugin>-->
+                <!--                    <groupId>com.coderplus.maven.plugins</groupId>-->
+                <!--                    <artifactId>copy-rename-maven-plugin</artifactId>-->
+                <!--                    <version>1.0.1</version>-->
+                <!--                    <executions>-->
+                <!--                        <execution>-->
+                <!--                            <id>rename-site-jar-to-zip</id>-->
+                <!--                            <phase>verify</phase>-->
+                <!--                            <goals>-->
+                <!--                                <goal>rename</goal>-->
+                <!--                            </goals>-->
+                <!--                            <configuration>-->
+                <!--                                <sourceFile>${project.build.directory}/${project.build.finalName}-site.jar</sourceFile>-->
+                <!--                                <destinationFile>${project.build.directory}/${project.build.finalName}-site.zip</destinationFile>-->
+                <!--                            </configuration>-->
+                <!--                        </execution>-->
+                <!--                    </executions>-->
+                <!--                </plugin>-->
             </plugins>
         </pluginManagement>
 
@@ -635,6 +655,42 @@
 
     <reporting>
         <plugins>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>4.2.2</version>
+                <configuration>
+                    <xmlOutput>true</xmlOutput>
+                    <xmlOutputDirectory>target/site</xmlOutputDirectory>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>2.8.1</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>dependency-updates-report</report>
+                            <report>plugin-updates-report</report>
+                            <report>property-updates-report</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>checkstyle</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>

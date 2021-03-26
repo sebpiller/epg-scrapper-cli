@@ -3,6 +3,7 @@ package ch.sebpiller.epg.scrapper.tsr;
 import ch.sebpiller.epg.Channel;
 import ch.sebpiller.epg.EpgInfo;
 import ch.sebpiller.epg.scrapper.IntegrationTest;
+import org.assertj.core.api.Assertions;
 import org.jsoup.Jsoup;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -52,7 +53,8 @@ class RtsEpgScrapperIntegrationTest extends IntegrationTest {
             return e.getTimeStart().isBefore(inAWeek);
         });
 
-        allInfos.forEach(System.out::println);
+        Assertions.assertThat(allInfos).isNotEmpty().hasSizeGreaterThan(100);
+        System.out.println("Found " + allInfos.size() + " items");
 
         /*ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("all_epg_info.data"));
         oos.writeObject(allInfos);

@@ -2,6 +2,7 @@ package ch.sebpiller.epg.scrapper.ocs;
 
 import ch.sebpiller.epg.Channel;
 import ch.sebpiller.epg.EpgInfo;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
@@ -38,7 +39,8 @@ class OcsEpgScrapperIntegrationTest {
             return e.getTimeStart().isBefore(inAWeek);
         });
 
-        allInfos.forEach(System.out::println);
+        Assertions.assertThat(allInfos).isNotEmpty().hasSizeGreaterThan(100);
+        System.out.println("Found " + allInfos.size() + " items");
 
         /*ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("all_ocs_epg_info.data"));
         oos.writeObject(allInfos);

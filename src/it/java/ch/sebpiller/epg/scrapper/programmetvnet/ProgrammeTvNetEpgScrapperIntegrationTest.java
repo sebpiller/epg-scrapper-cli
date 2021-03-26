@@ -2,6 +2,7 @@ package ch.sebpiller.epg.scrapper.programmetvnet;
 
 import ch.sebpiller.epg.Channel;
 import ch.sebpiller.epg.EpgInfo;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import ch.sebpiller.epg.scrapper.IntegrationTest;
 import org.junit.jupiter.api.DisplayName;
@@ -37,7 +38,8 @@ class ProgrammeTvNetEpgScrapperIntegrationTest extends IntegrationTest {
             return true;
         });
 
-        allInfos.forEach(System.out::println);
+        Assertions.assertThat(allInfos).isNotEmpty().hasSizeGreaterThan(100);
+        System.out.println("Found " + allInfos.size() + " items");
 
        /* ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("all_programmetvnet_epg_info.data"));
         oos.writeObject(allInfos);
