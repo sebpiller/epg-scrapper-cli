@@ -21,6 +21,7 @@
         <timestamp>${maven.build.timestamp}</timestamp>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 
+        <skipUTs>false</skipUTs>
         <failIfNoTests>true</failIfNoTests>
     </properties>
 
@@ -262,6 +263,7 @@
                     <version>3.0.0-M5</version>
 
                     <configuration>
+                        <skipTests>${skipUTs}</skipTests>
                         <excludes>
                             <exclude>**/*IntegrationTest.java</exclude>
                         </excludes>

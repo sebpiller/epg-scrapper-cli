@@ -72,7 +72,7 @@ stages
     {
      script
       {
-         sh 'mvn --batch-mode verify'
+         sh 'mvn --batch-mode verify -DskipUTs'
       }
     }
   }
