@@ -77,7 +77,7 @@ stages
     }
   }
 
-  stage('Sanity check')
+  stage('Sanity checks')
    {
     steps
      {
