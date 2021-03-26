@@ -54,7 +54,7 @@ stages
      {
       script
        {
-          sh 'mvn --batch-mode resources:testResources compiler:testCompile surefire:test'
+          sh 'mvn --batch-mode verify -DskipITs'
        }
      }
     post
@@ -72,7 +72,7 @@ stages
     {
      script
       {
-         sh 'mvn --batch-mode failsafe:integration-test@integration-test failsafe:verify@verify-it -X'
+         sh 'mvn --batch-mode verify'
       }
     }
   }
