@@ -1,9 +1,8 @@
 package ch.sebpiller.epg.scrapper.telecablesatfr;
 
-import ch.sebpiller.epg.Audience;
-import ch.sebpiller.epg.EpgInfo;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@DisplayName("Telecable Sat FR Scrapper test")
 class TelecableSatFrScrapperTest {
     private static final Logger LOG = LoggerFactory.getLogger(TelecableSatFrScrapperTest.class);
     private int i = 0;
@@ -25,7 +25,9 @@ class TelecableSatFrScrapperTest {
                 Jsoup.parse(getClass().getResourceAsStream("/telecablesatfr/sample_noon.html"), StandardCharsets.UTF_8.name(), ""),
         };
 
-        TelecableSatFrScrapper scrapper = new TelecableSatFrScrapper();
+        TelecableSatFrScrapper scrapper = new TelecableSatFrScrapper() {
+
+        };
 
         // do not scrape details
         for (Document doc : docs) {

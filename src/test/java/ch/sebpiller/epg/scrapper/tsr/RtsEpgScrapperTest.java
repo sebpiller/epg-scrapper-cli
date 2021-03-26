@@ -1,19 +1,23 @@
 package ch.sebpiller.epg.scrapper.tsr;
 
+import ch.sebpiller.epg.Channel;
 import ch.sebpiller.epg.EpgInfo;
+import ch.sebpiller.epg.scrapper.EpgInfoScrappedListener;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@DisplayName("RTS Scrapper test")
 class RtsEpgScrapperTest {
     private static final Logger LOG = LoggerFactory.getLogger(RtsEpgScrapperTest.class);
 
@@ -57,19 +61,19 @@ class RtsEpgScrapperTest {
         Document doc;
 
         doc = Jsoup.parse(getClass().getResourceAsStream("/sample_details_1_rts.html"), StandardCharsets.UTF_8.name(), "");
-        scrapper.parseDetails(info = new EpgInfo(), doc);
+        scrapper.parseDetails(info = new EpgInfo(Channel.M6), doc);
         LOG.info("{}", info);
         assertThat(info.getCategory()).isNotNull();
         assertThat(info.getDescription()).isNotNull();
 
         doc = Jsoup.parse(getClass().getResourceAsStream("/sample_details_2_rts.html"), StandardCharsets.UTF_8.name(), "");
-        scrapper.parseDetails(info = new EpgInfo(), doc);
+        scrapper.parseDetails(info = new EpgInfo(Channel.RTS1), doc);
         LOG.info("{}", info);
         assertThat(info.getDescription()).isNotNull();
         assertThat(info.getActors()).isNotNull().isNotEmpty().hasSizeGreaterThan(3);
 
         doc = Jsoup.parse(getClass().getResourceAsStream("/sample_details_3_rts.html"), StandardCharsets.UTF_8.name(), "");
-        scrapper.parseDetails(info = new EpgInfo(), doc);
+        scrapper.parseDetails(info = new EpgInfo(Channel.RTS1), doc);
         LOG.info("{}", info);
         assertThat(info.getDescription()).isNotNull();
     }

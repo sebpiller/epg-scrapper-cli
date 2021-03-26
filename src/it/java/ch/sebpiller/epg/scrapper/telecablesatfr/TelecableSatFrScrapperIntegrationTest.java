@@ -1,7 +1,9 @@
 package ch.sebpiller.epg.scrapper.telecablesatfr;
 
 import ch.sebpiller.epg.EpgInfo;
+import ch.sebpiller.epg.scrapper.IntegrationTest;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.slf4j.Logger;
@@ -13,9 +15,10 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+@DisplayName("Telecable Sat FR Scrapper integration")
 @Disabled("TelecableSatFrScrapper is deprecated")
 @EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
-class TelecableSatFrScrapperIntegrationTest {
+class TelecableSatFrScrapperIntegrationTest extends IntegrationTest {
     private static final Logger LOG = LoggerFactory.getLogger(TelecableSatFrScrapperIntegrationTest.class);
 
     // TODO implement
