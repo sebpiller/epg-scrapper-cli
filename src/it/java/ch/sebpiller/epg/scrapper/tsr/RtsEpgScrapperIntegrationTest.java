@@ -3,6 +3,7 @@ package ch.sebpiller.epg.scrapper.tsr;
 import ch.sebpiller.epg.EpgInfo;
 import ch.sebpiller.epg.scrapper.IntegrationTest;
 import org.jsoup.Jsoup;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @DisplayName("RTS Scrapper integration")
+@Disabled("TvSearchChIntegrationTest disabled for Jenkins DEBUGGING")
 @EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
 class RtsEpgScrapperIntegrationTest extends IntegrationTest {
     private static final Logger LOG = LoggerFactory.getLogger(RtsEpgScrapperIntegrationTest.class);

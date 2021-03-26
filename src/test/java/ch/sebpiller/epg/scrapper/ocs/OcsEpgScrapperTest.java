@@ -4,6 +4,7 @@ import ch.sebpiller.epg.Channel;
 import ch.sebpiller.epg.EpgInfo;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -19,16 +20,22 @@ class OcsEpgScrapperTest {
     private static final Logger LOG = LoggerFactory.getLogger(OcsEpgScrapperTest.class);
     private int i = 0;
 
-    @Test
-    void testScrapeFromLocal() throws IOException {
-        Document doc = Jsoup.parse(getClass().getResourceAsStream("/sample_ocs.html"), StandardCharsets.UTF_8.name(), "");
+    private OcsEpgScrapper scrapper;
 
-        OcsEpgScrapper scrapper = new OcsEpgScrapper() {
+
+    @BeforeEach
+    void setUp() {
+        scrapper = new OcsEpgScrapper() {
             @Override
             public void parseDetails(String uri, EpgInfo info) {
                 // noop
             }
         };
+    }
+
+    @Test
+    void testScrapeFromLocal() throws IOException {
+        Document doc = Jsoup.parse(getClass().getResourceAsStream("/sample_ocs.html"), StandardCharsets.UTF_8.name(), "");
 
         // do not scrape details
         scrapper.scrapeDocument(doc, c -> true, e -> {
@@ -43,14 +50,8 @@ class OcsEpgScrapperTest {
 
     @Test
     void testScrapeDetailsFromLocal() throws IOException {
-        OcsEpgScrapper scrapper = new OcsEpgScrapper() {
-            @Override
-            public void parseDetails(String uri, EpgInfo info) {
-                // noop
-            }
-        };
-
         EpgInfo info;
+
         Document doc;
 
         doc = Jsoup.parse(getClass().getResourceAsStream("/sample_details_4_ocs.html"), StandardCharsets.UTF_8.name(), "");

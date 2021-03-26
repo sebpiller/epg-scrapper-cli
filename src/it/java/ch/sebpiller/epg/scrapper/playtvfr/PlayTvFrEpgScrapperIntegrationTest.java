@@ -3,6 +3,7 @@ package ch.sebpiller.epg.scrapper.playtvfr;
 import ch.sebpiller.epg.EpgInfo;
 import ch.sebpiller.epg.scrapper.IntegrationTest;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @DisplayName("PlayTV FR Scrapper integration")
+@Disabled("OCS disabled for Jenkins DEBUGGING")
 @EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
 class PlayTvFrEpgScrapperIntegrationTest extends IntegrationTest {
     private static final Logger LOG = LoggerFactory.getLogger(PlayTvFrEpgScrapperIntegrationTest.class);

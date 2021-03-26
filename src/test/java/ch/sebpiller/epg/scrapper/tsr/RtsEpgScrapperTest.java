@@ -22,10 +22,17 @@ class RtsEpgScrapperTest {
     private static final Logger LOG = LoggerFactory.getLogger(RtsEpgScrapperTest.class);
 
     private int i;
+    private RtsEpgScrapper scrapper;
 
     @BeforeEach
     public void setUp() {
         this.i = 0;
+        scrapper = new RtsEpgScrapper(){
+            @Override
+            void parseDetails(String detailUriId, EpgInfo info) {
+                // ignore
+            }
+        };
     }
 
     @Test
@@ -36,13 +43,6 @@ class RtsEpgScrapperTest {
     @Test
     void testScrapeFromLocal() throws IOException {
         Document doc = Jsoup.parse(getClass().getResourceAsStream("/sample_rts.html"), StandardCharsets.UTF_8.name(), "");
-
-        RtsEpgScrapper scrapper = new RtsEpgScrapper() {
-            @Override
-            void parseDetails(String detailUriId, EpgInfo info) {
-                // noop
-            }
-        };
 
         // do not scrape details
         scrapper.scrapeDocument(doc, c -> true, e -> {
@@ -57,9 +57,7 @@ class RtsEpgScrapperTest {
 
     @Test
     void testScrapeDetailsFromLocal() throws IOException {
-        RtsEpgScrapper scrapper = new RtsEpgScrapper();
         EpgInfo info;
-
         Document doc;
 
         doc = Jsoup.parse(getClass().getResourceAsStream("/sample_details_1_rts.html"), StandardCharsets.UTF_8.name(), "");
