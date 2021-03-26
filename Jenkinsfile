@@ -147,7 +147,7 @@ stages
      {
       script
        {
-          sh 'mvn --batch-mode deploy:deploy'
+          sh 'mvn --batch-mode deploy -DskipTest'
        }
      }
    }
