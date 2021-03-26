@@ -25,8 +25,8 @@
         <skipUTs>false</skipUTs>
         <failIfNoTests>true</failIfNoTests>
 
-        <surefire.jacoco.args>will_contains_jacoco_env_for_surefire</surefire.jacoco.args>
-        <failsafe.jacoco.args>will_contains_jacoco_env_for_failsafe</failsafe.jacoco.args>
+        <surefire.jacoco.args/>
+        <failsafe.jacoco.args/>
     </properties>
 
     <developers>
@@ -134,28 +134,45 @@
         <profile>
             <id>jenkins</id>
             <activation>
-<!--                <property>-->
-<!--                    <name>env.BUILD_NUMBER</name>-->
-<!--                </property>-->
+                <!--                <property>-->
+                <!--                    <name>env.BUILD_NUMBER</name>-->
+                <!--                </property>-->
                 <activeByDefault>true</activeByDefault>
             </activation>
-            <build>
-            </build>
-            <reporting>
-                <plugins>
-                    <plugin>
-                        <groupId>org.jacoco</groupId>
-                        <artifactId>jacoco-maven-plugin</artifactId>
-                        <reportSets>
-                            <reportSet>
-                                <reports>
-                                    <report>report</report>
-                                </reports>
-                            </reportSet>
-                        </reportSets>
-                    </plugin>
-                </plugins>
-            </reporting>
+            <!--            <reporting>-->
+            <!--                <plugins>-->
+            <!--                    <plugin>-->
+            <!--                        <groupId>org.jacoco</groupId>-->
+            <!--                        <artifactId>jacoco-maven-plugin</artifactId>-->
+            <!--                        <configuration>-->
+            <!--                            <dataFile>${project.build.directory}/UT-coverage.jacoco</dataFile>-->
+            <!--                            <outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>-->
+            <!--                        </configuration>-->
+            <!--                        <reportSets>-->
+            <!--                            <reportSet>-->
+            <!--                                <reports>-->
+            <!--                                    <report>report</report>-->
+            <!--                                </reports>-->
+            <!--                            </reportSet>-->
+            <!--                        </reportSets>-->
+            <!--                    </plugin>-->
+            <!--                    <plugin>-->
+            <!--                        <groupId>org.jacoco</groupId>-->
+            <!--                        <artifactId>jacoco-maven-plugin</artifactId>-->
+            <!--                        <configuration>-->
+            <!--                            <dataFile>${project.build.directory}/IT-coverage.jacoco</dataFile>-->
+            <!--                            <outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>-->
+            <!--                        </configuration>-->
+            <!--                        <reportSets>-->
+            <!--                            <reportSet>-->
+            <!--                                <reports>-->
+            <!--                                    <report>report-integration</report>-->
+            <!--                                </reports>-->
+            <!--                            </reportSet>-->
+            <!--                        </reportSets>-->
+            <!--                    </plugin>-->
+            <!--                </plugins>-->
+            <!--            </reporting>-->
 
         </profile>
     </profiles>
@@ -181,6 +198,52 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>3.0.0-M1</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.2.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>3.2.0</version>
+                </plugin>
+
+                <!-- deploy 2.8.x required to have distribution management configured in settings.xml instead of pom -->
+                <plugin>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>2.8.2</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>versions-maven-plugin</artifactId>
+                    <version>2.8.1</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>3.0.0-M3</version>
+                    <executions>
+                        <execution>
+                            <id>enforce-maven</id>
+                            <goals>
+                                <goal>enforce</goal>
+                            </goals>
+                            <configuration>
+                                <rules>
+                                    <requireMavenVersion>
+                                        <version>3.1.0</version>
+                                    </requireMavenVersion>
+                                </rules>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
                     <version>3.1.1</version>
@@ -193,21 +256,25 @@
                     <executions>
                         <!-- Surefire -->
                         <execution>
+                            <id>before-unit-test-execution</id>
                             <goals>
                                 <goal>prepare-agent</goal>
                             </goals>
                             <configuration>
+                                <append>false</append>
                                 <destFile>${project.build.directory}/UT-coverage.jacoco</destFile>
                                 <propertyName>surefire.jacoco.args</propertyName>
                             </configuration>
                         </execution>
                         <execution>
                             <id>after-unit-test-execution</id>
+                            <!--                            <phase>verify</phase>-->
                             <goals>
                                 <goal>report</goal>
                             </goals>
                             <configuration>
                                 <dataFile>${project.build.directory}/UT-coverage.jacoco</dataFile>
+                                <outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
                             </configuration>
                         </execution>
 
@@ -219,6 +286,7 @@
                                 <goal>prepare-agent</goal>
                             </goals>
                             <configuration>
+                                <append>false</append>
                                 <destFile>${project.build.directory}/IT-coverage.jacoco</destFile>
                                 <propertyName>failsafe.jacoco.args</propertyName>
                             </configuration>
@@ -227,54 +295,43 @@
                             <id>after-integration-test-execution</id>
                             <phase>post-integration-test</phase>
                             <goals>
-                                <goal>report</goal>
+                                <goal>report-integration</goal>
                             </goals>
                             <configuration>
                                 <dataFile>${project.build.directory}/IT-coverage.jacoco</dataFile>
-                                <outputDirectory>${project.reporting.outputDirectory}</outputDirectory>
+                                <outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
                             </configuration>
                         </execution>
 
                         <!-- Merged test coverage report -->
-                        <execution>
-                            <id>merge-unit-and-integration</id>
-                            <phase>post-integration-test</phase>
-                            <goals>
-                                <goal>merge</goal>
-                            </goals>
-                            <configuration>
-                                <fileSets>
-                                    <fileSet>
-                                        <directory>${project.build.directory}</directory>
-                                        <includes>
-                                            <include>*.jacoco</include>
-                                        </includes>
-                                    </fileSet>
-                                </fileSets>
-                                <destFile>${project.build.directory}/MERGED-coverage.jacoco</destFile>
-                            </configuration>
-                        </execution>
-
-                        <execution>
-                            <id>create-merged-report</id>
-                            <phase>post-integration-test</phase>
-                            <goals>
-                                <goal>report</goal>
-                            </goals>
-                            <configuration>
-                                <dataFile>${project.build.directory}/MERGED-coverage.jacoco</dataFile>
-                                <outputDirectory>${project.reporting.outputDirectory}</outputDirectory>
-                            </configuration>
-                        </execution>
+                        <!--                        <execution>-->
+                        <!--                            <id>merge-unit-and-integration</id>-->
+                        <!--                            <phase>post-integration-test</phase>-->
+                        <!--                            <goals>-->
+                        <!--                                <goal>merge</goal>-->
+                        <!--                            </goals>-->
+                        <!--                            <configuration>-->
+                        <!--                                <fileSets>-->
+                        <!--                                    <fileSet>-->
+                        <!--                                        <directory>${project.build.directory}</directory>-->
+                        <!--                                        <includes>-->
+                        <!--                                            <include>*.jacoco</include>-->
+                        <!--                                        </includes>-->
+                        <!--                                    </fileSet>-->
+                        <!--                                </fileSets>-->
+                        <!--                                <destFile>${project.build.directory}/MERGED-coverage.jacoco</destFile>-->
+                        <!--                            </configuration>-->
+                        <!--                        </execution>-->
 
                         <!-- Code coverage threshold -->
                         <execution>
-                            <id>check</id>
+                            <id>check-coverage</id>
                             <phase>verify</phase>
                             <goals>
                                 <goal>check</goal>
                             </goals>
                             <configuration>
+                                <skip>true</skip><!-- TODO reactivate -->
                                 <rules>
                                     <rule>
                                         <element>CLASS</element>
@@ -293,6 +350,31 @@
                                 <dataFile>${project.build.directory}/MERGED-coverage.jacoco</dataFile>
                             </configuration>
                         </execution>
+
+
+                        <!-- create the html reports -->
+                        <!--                        <execution>-->
+                        <!--                            <id>create-report-ut</id>-->
+                        <!--                            <phase>site</phase>-->
+                        <!--                            <goals>-->
+                        <!--                                <goal>report</goal>-->
+                        <!--                            </goals>-->
+                        <!--                            <configuration>-->
+                        <!--                                <dataFile>${project.build.directory}/UT-coverage.jacoco</dataFile>-->
+                        <!--                                <outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>-->
+                        <!--                            </configuration>-->
+                        <!--                        </execution>-->
+                        <!--                        <execution>-->
+                        <!--                            <id>create-report-it</id>-->
+                        <!--                            <phase>site</phase>-->
+                        <!--                            <goals>-->
+                        <!--                                <goal>report-integration</goal>-->
+                        <!--                            </goals>-->
+                        <!--                            <configuration>-->
+                        <!--                                <dataFile>${project.build.directory}/IT-coverage.jacoco</dataFile>-->
+                        <!--                                <outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>-->
+                        <!--                            </configuration>-->
+                        <!--                        </execution>-->
                     </executions>
                 </plugin>
 
@@ -350,51 +432,6 @@
                             <goals>
                                 <goal>testCompile</goal>
                             </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-install-plugin</artifactId>
-                    <version>3.0.0-M1</version>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.2.0</version>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.2.0</version>
-                </plugin>
-
-                <!-- deploy 2.8.x required to have distribution management configured in settings.xml instead of pom -->
-                <plugin>
-                    <artifactId>maven-deploy-plugin</artifactId>
-                    <version>2.8.2</version>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.8.1</version>
-                </plugin>
-
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.0.0-M3</version>
-                    <executions>
-                        <execution>
-                            <id>enforce-maven</id>
-                            <goals>
-                                <goal>enforce</goal>
-                            </goals>
-                            <configuration>
-                                <rules>
-                                    <requireMavenVersion>
-                                        <version>3.1.0</version>
-                                    </requireMavenVersion>
-                                </rules>
-                            </configuration>
                         </execution>
                     </executions>
                 </plugin>
@@ -483,7 +520,7 @@
                     <version>3.0.0-M5</version>
 
                     <configuration>
-                        <argLine>${surefire.jacoco.args}</argLine>
+                        <argLine>@{surefire.jacoco.args}</argLine>
                         <skipTests>${skipUTs}</skipTests>
                         <excludes>
                             <!-- Do not process integration tests with surefire. Failsafe will do the job -->
@@ -501,18 +538,18 @@
                         <includes>
                             <include>**/*IntegrationTest.java</include>
                         </includes>
-                        <argLine>${failsafe.jacoco.args}</argLine>
+                        <argLine>@{failsafe.jacoco.args}</argLine>
                     </configuration>
                     <executions>
                         <execution>
-                            <id>integration-test</id>
+                            <id>run-integration-test</id>
                             <phase>integration-test</phase>
                             <goals>
                                 <goal>integration-test</goal>
                             </goals>
                         </execution>
                         <execution>
-                            <id>verify-it</id>
+                            <id>verify-integration-test</id>
                             <phase>verify</phase>
                             <goals>
                                 <goal>verify</goal>
@@ -533,24 +570,20 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
             </plugin>
-
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
             </plugin>
-
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
             </plugin>
-
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
             <plugin>
                 <artifactId>maven-enforcer-plugin</artifactId>
             </plugin>
-
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
             </plugin>
@@ -562,5 +595,41 @@
             </plugin>
 
         </plugins>
+
     </build>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <configuration>
+                    <append>false</append>
+                    <dataFile>${project.build.directory}/UT-coverage.jacoco</dataFile>
+                </configuration>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>report</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <configuration>
+                    <append>false</append>
+                    <dataFile>${project.build.directory}/IT-coverage.jacoco</dataFile>
+                </configuration>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>report-integration</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+        </plugins>
+    </reporting>
 </project>

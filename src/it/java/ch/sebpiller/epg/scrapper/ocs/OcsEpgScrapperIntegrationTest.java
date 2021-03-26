@@ -1,5 +1,6 @@
 package ch.sebpiller.epg.scrapper.ocs;
 
+import ch.sebpiller.epg.Channel;
 import ch.sebpiller.epg.EpgInfo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
@@ -25,7 +26,7 @@ class OcsEpgScrapperIntegrationTest {
 
         long start = System.currentTimeMillis();
         OcsEpgScrapper scrapper = new OcsEpgScrapper();
-        scrapper.scrapeEpg(c -> true, e -> {
+        scrapper.scrapeEpg(c -> c == Channel.OCS_CHOC, e -> {
             allInfos.add(e);
 
             if (allInfos.size() % 100 == 0) {
