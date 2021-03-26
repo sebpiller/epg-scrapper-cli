@@ -108,7 +108,7 @@ stages
      {
       script
        {
-          sh 'mvn --batch-mode deploy -DskipUTs -DskipITs'
+          sh 'mvn --batch-mode deploy -DskipUTs -DskipITs -X'
        }
      }
    }

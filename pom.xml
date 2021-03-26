@@ -587,7 +587,6 @@
                     <executions>
                         <execution>
                             <id>pack-site</id>
-                            <phase>verify</phase>
                             <goals>
                                 <goal>site</goal>
                                 <goal>jar</goal>
@@ -598,25 +597,6 @@
                         </execution>
                     </executions>
                 </plugin>
-
-                <!--                <plugin>-->
-                <!--                    <groupId>com.coderplus.maven.plugins</groupId>-->
-                <!--                    <artifactId>copy-rename-maven-plugin</artifactId>-->
-                <!--                    <version>1.0.1</version>-->
-                <!--                    <executions>-->
-                <!--                        <execution>-->
-                <!--                            <id>rename-site-jar-to-zip</id>-->
-                <!--                            <phase>verify</phase>-->
-                <!--                            <goals>-->
-                <!--                                <goal>rename</goal>-->
-                <!--                            </goals>-->
-                <!--                            <configuration>-->
-                <!--                                <sourceFile>${project.build.directory}/${project.build.finalName}-site.jar</sourceFile>-->
-                <!--                                <destinationFile>${project.build.directory}/${project.build.finalName}-site.zip</destinationFile>-->
-                <!--                            </configuration>-->
-                <!--                        </execution>-->
-                <!--                    </executions>-->
-                <!--                </plugin>-->
             </plugins>
         </pluginManagement>
 
