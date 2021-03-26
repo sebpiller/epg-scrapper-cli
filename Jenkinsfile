@@ -105,7 +105,7 @@ stages
      {
       script
        {
-          sh 'mvn --batch-mode jar:jar source:jar install:install'
+          sh 'mvn --batch-mode install -DskipITs -DskipUTs'
        }
      }
    }
@@ -147,7 +147,7 @@ stages
      {
       script
        {
-          sh 'mvn --batch-mode deploy -DskipTest'
+          sh 'mvn --batch-mode deploy'
        }
      }
    }
