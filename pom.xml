@@ -293,7 +293,6 @@
                             <configuration>
                                 <rules>
                                     <rule>
-                                        <element>CLASS</element>
                                         <excludes>
                                             <exclude>*Test</exclude>
                                         </excludes>
@@ -319,7 +318,6 @@
                             <configuration>
                                 <rules>
                                     <rule>
-                                        <element>CLASS</element>
                                         <excludes>
                                             <exclude>*Test</exclude>
                                         </excludes>
