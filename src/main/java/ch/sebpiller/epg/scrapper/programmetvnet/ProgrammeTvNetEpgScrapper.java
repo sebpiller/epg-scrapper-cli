@@ -84,7 +84,8 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
             do {
                 try {
                     // fetch data for current channel
-                    doc = Jsoup.connect(ROOT_URL + '/' + DAYSTR_FORMAT.format(dayFetch) + '/' + c.getValue() + ".html").get();
+                    String url = ROOT_URL + '/' + DAYSTR_FORMAT.format(dayFetch) + '/' + c.getValue() + ".html";
+                    doc = Jsoup.connect(url).get();
                     scrapeDocument(doc, listener);
                     dayFetch = dayFetch.plusDays(1); // tomorrow
                 } catch (HttpStatusException e) {
@@ -124,59 +125,6 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
         if (c == null) {
             throw new ScrappingException("can not find channel " + text);
         }
-
-        /*
-            <div class="singleBroadcastCard" data-wide-target>
-                            <div class="singleBroadcastCard-hour" data-startinghour="00">
-                                00h40
-                            </div>
-                            <div class="singleBroadcastCard-infos">
-                                <a class="singleBroadcastCard-title" href="https://www.programme-tv.net/programme/jeunesse/r206118-jayce-et-les-conquerants-de-la-lumiere/139055-lenlevement-dun-savant/" data-wide>
-                                    Jayce et les conquérants de la lumière
-                                </a>
-                                <div class="singleBroadcastCard-subtitle">
-                                    L&#039;enlèvement d&#039;un savant
-                                </div>
-                                <div class="singleBroadcastCard-genre">
-                                    Dessin animé
-                                </div>
-                                <div class="singleBroadcastCard-duration">
-            <span class="singleBroadcastCard-durationContent">
-                                        25min
-            </span>
-                                    <div class="singleBroadcastCard-rebroadcast">Rediffusion</div>
-                                </div>
-                            </div>
-                            <div class="singleBroadcastCard-imageWrapper">
-
-
-
-
-                                <div class="pictureTagGenerator  pictureTagGenerator-ratio-5-7">
-
-
-                                    <img src="https://tel.img.pmdstatic.net/fit/https.3A.2F.2Fprd2-tel-epg-img.2Es3-eu-west-1.2Eamazonaws.2Ecom.2Fprogram.2F61fff3819c85b5e4.2Ejpg/64x90/quality/80/jayce-et-les-conquerants-de-la-lumiere.jpg"
-                                         sizes="(max-width: 750px) 64px, (max-width: 1023px) 64px, (min-width: 1024px) 64px"
-                                         srcset="https://tel.img.pmdstatic.net/fit/https.3A.2F.2Fprd2-tel-epg-img.2Es3-eu-west-1.2Eamazonaws.2Ecom.2Fprogram.2F61fff3819c85b5e4.2Ejpg/64x90/quality/80/jayce-et-les-conquerants-de-la-lumiere.jpg 64w, https://tel.img.pmdstatic.net/fit/https.3A.2F.2Fprd2-tel-epg-img.2Es3-eu-west-1.2Eamazonaws.2Ecom.2Fprogram.2F61fff3819c85b5e4.2Ejpg/128x180/quality/80/jayce-et-les-conquerants-de-la-lumiere.jpg 128w"
-                                         alt="Jayce et les conquérants de la lumière"
-                                         class="  apply-ratio" />
-
-                                    <div class="singleBroadcastCard-itemImageBlocHover"><span class="singleBroadcastCard-itemImageBlocHoverText">Lire <br /> le <br />résumé</span></div>
-
-                                </div>
-
-
-                                <span class="singleBroadcastCard-arrow">
-
-    <svg class="icon icon-chevron-right"
-    >
-                <use href="#chevron-right"></use>
-    </svg>
-
-        </span>
-                            </div>
-                        </div>
-         */
 
         for (Element a : doc.getElementsByClass("singleBroadcastCard")) {
             EpgInfo info = new EpgInfo(c);

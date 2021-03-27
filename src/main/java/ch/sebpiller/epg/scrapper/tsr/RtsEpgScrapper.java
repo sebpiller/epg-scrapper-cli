@@ -135,7 +135,8 @@ public class RtsEpgScrapper implements EpgScrapper {
     void scrapeDocument(Document doc, Predicate<Channel> filterChannel, EpgInfoScrappedListener listener) {
         Elements epg = doc.select("section.schedules.day");
         if (epg.size() != 1) {
-            throw new IllegalArgumentException("invalid document: no unique 'section' with classes 'schedules' and 'day' !");
+            throw new IllegalArgumentException("invalid document: no unique 'section' with classes " +
+                    "'schedules' and 'day' !");
         }
 
         for (Element elChannel : epg.get(0).children()) {
