@@ -1,4 +1,5 @@
 epg-scrapper.iml
+epg-scrapper-cli.iml
 target/
 pom.xml.tag
 pom.xml.releaseBackup

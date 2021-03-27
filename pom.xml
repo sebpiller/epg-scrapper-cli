@@ -4,14 +4,17 @@
 
     <groupId>ch.sebpiller</groupId>
     <artifactId>epg-scrapper-cli</artifactId>
-    <version>${revision}</version>
+    <version>${branch}${feature}${revision}${modifier}</version>
     <name>EPG Scrapper CLI</name>
     <description>A project to scrape EPG (Electronic Program Guide) information from various sources, to populate
         eg. TVHeadend EPG.
     </description>
 
     <properties>
-        <revision>1.1.0-SNAPSHOT</revision>
+        <branch>1.1.0</branch><!-- fallback when not in a release branch-->
+        <feature /> <!-- tag with the feature name for feature branches build -->
+        <revision /><!-- will be assigned by jenkins -->
+        <modifier>-SNAPSHOT</modifier><!-- replace with blank for a release deploy -->
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -21,7 +24,7 @@
         <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
 
-        <jacoco.mincoverage>50%</jacoco.mincoverage>
+        <jacoco.mincoverage>30%</jacoco.mincoverage>
 
         <timestamp>${maven.build.timestamp}</timestamp>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
@@ -162,6 +165,38 @@
 
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>flatten-maven-plugin</artifactId>
+                    <version>1.2.7</version>
+                    <configuration>
+                        <updatePomFile>true</updatePomFile>
+                        <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>flatten</id>
+                            <phase>process-resources</phase>
+                            <goals>
+                                <goal>flatten</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>flatten.clean</id>
+                            <phase>clean</phase>
+                            <goals>
+                                <goal>clean</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-scm-plugin</artifactId>
+                    <version>1.11.2</version>
+                    <configuration>
+                        <tag>${project.artifactId}-${project.version}</tag>
+                    </configuration>
+                </plugin>
                 <plugin>
                     <artifactId>maven-antrun-plugin</artifactId>
                     <version>3.0.0</version>
@@ -549,6 +584,10 @@
         </pluginManagement>
 
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
