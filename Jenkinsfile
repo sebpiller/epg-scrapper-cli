@@ -40,9 +40,10 @@ stages
           def matcherRelease = BRANCH =~ /^release\/(.*)$/
 
           if(matcherRelease.matches()) {
-             echo "we are in a release ! " + matcherRelease[0][1]
+             env.RELEASE_MAJ_MIN = matcherRelease[0][1]
+             echo "we are in a release ! " + env.RELEASE_MAJ_MIN
           } else {
-           echo "too bad dude, not in a release...."
+             echo "too bad dude, not in a release...."
           }
        }
      }
