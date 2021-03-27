@@ -4,15 +4,16 @@
 
     <groupId>ch.sebpiller</groupId>
     <artifactId>epg-scrapper-cli</artifactId>
-    <version>${branch}.${revision}${modifier}</version>
+    <version>${branch}${feature}${revision}${modifier}</version>
     <name>EPG Scrapper CLI</name>
     <description>A project to scrape EPG (Electronic Program Guide) information from various sources, to populate
         eg. TVHeadend EPG.
     </description>
 
     <properties>
-        <branch>1.1</branch><!-- fallback when not in a release branch-->
-        <revision>0</revision><!-- will be assigned by jenkins -->
+        <branch>1.1.0</branch><!-- fallback when not in a release branch-->
+        <feature /> <!-- tag with the feature name for feature branches build -->
+        <revision /><!-- will be assigned by jenkins -->
         <modifier>-SNAPSHOT</modifier><!-- replace with blank for a release deploy -->
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
