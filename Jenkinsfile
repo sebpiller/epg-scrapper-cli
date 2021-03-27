@@ -36,18 +36,14 @@ stages
      {
       script
        {
-          sh '''
-              export isRelease=$(echo "${BRANCH}" | grep -qE "^release/.*$" && echo 'yes' || echo 'no')
-              echo $isRelease
+          echo BRANCH
+          def matcherRelease = BRANCH =~ /^release\/(.*)$/
 
-              if [ "${isRelease}" = "yes" ]
-              then
-                  export relbr=$(echo ${BRANCH} | sed -r 's/(release\\/)(.*)/\\2/')
-                  echo "WE ARE CURRENTLY BUILDING RELEASE BRANCH for main version ${relbr} and build $BUILD_NUMBER"
-              else
-                  echo "NOT IN A RELEASE BRANCH, SO NO RELEASE IS GOING TO BE BUILT but we are building a version $BUILD_NUMBER"
-              fi
-          '''
+          if(matcherRelease.matches()) {
+             echo "we are in a release ! " + matcherRelease[0][1]
+          } else {
+           echo "too bad dude, not in a release...."
+          }
        }
      }
    }
