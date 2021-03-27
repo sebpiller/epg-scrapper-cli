@@ -2,6 +2,10 @@ pipeline
 {
 agent any
 
+environment {
+    BRANCH = "${env.BRANCH_NAME}"
+}
+
 tools
  {
   maven 'Maven'
@@ -25,6 +29,29 @@ triggers
 
 stages
  {
+
+  stage('Initialize')
+   {
+    steps
+     {
+      script
+       {
+          sh '''
+              export isRelease=$(echo "${BRANCH}" | grep -qE "^release/.*$" && echo 'yes' || echo 'no')
+              echo $isRelease
+
+              if [ "${isRelease}" = "yes" ]
+              then
+                  export relbr=$(echo ${BRANCH} | sed -r 's/(release\\/)(.*)/\\2/')
+                  echo "WE ARE CURRENTLY BUILDING RELEASE BRANCH for main version ${relbr} and build $BUILD_NUMBER"
+              else
+                  echo "NOT IN A RELEASE BRANCH, SO NO RELEASE IS GOING TO BE BUILT but we are building a version $BUILD_NUMBER"
+              fi
+          '''
+       }
+     }
+   }
+
   stage('Clean')
    {
     steps
@@ -103,13 +130,25 @@ stages
    }
 
 
-  stage('Deploy artifacts')
+  stage('Deploy and Tag')
    {
     steps
      {
       script
        {
-          sh 'mvn --batch-mode deploy -DskipUTs -DskipITs -Dmaven.site.skip'
+          sh '''
+              # check for release branch
+              if [[ "${BRANCH}" == release/* ]]
+              then
+                  echo "RELEASE BRANCH DETECTED"
+                  brid = ${BRANCH#*/}
+                  echo "branch version id: $brid"
+                  mvn --batch-mode deploy scm:tag -Dbranch=$brid -Drevision=$BUILD_NUMBER -Dmodifier= -DskipUTs -DskipITs -Dmaven.site.skip
+              else
+                  echo "STANDARD BRANCH DETECTED"
+                  mvn --batch-mode deploy scm:tag -Drevision=$BUILD_NUMBER -DskipUTs -DskipITs -Dmaven.site.skip
+              fi
+          '''
        }
      }
    }
