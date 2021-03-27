@@ -13,7 +13,8 @@ import static ch.sebpiller.epg.Channel.*;
  * Contains the list of channels provided by each type of scrappers.
  */
 public class ScrappersConfig {
-    private ScrappersConfig() {}
+    private ScrappersConfig() {
+    }
 
     public static final Set<Channel> RTS_CHANNELS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
             RTS1,

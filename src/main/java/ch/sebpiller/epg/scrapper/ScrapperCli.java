@@ -34,7 +34,7 @@ import java.util.function.Function;
         versionProvider = ScrapperCli.VersionProvider.class,
         header = {"spidy-tv-guide - epg scrapper - CLI"}
 )
-public class ScrapperCli implements Callable<Integer> {
+public final class ScrapperCli implements Callable<Integer> {
     public static final String ARTIFACT_ID = "epg-scrapper";
     static ScrapperCli scrapperCli;
 
@@ -61,7 +61,9 @@ public class ScrapperCli implements Callable<Integer> {
                             ARTIFACT_ID.equals(props.getProperty("artifact")),
                             "version file does not reference artifact " + ARTIFACT_ID);
 
-                    return new String[]{props.getProperty("version") + " (built on " + props.getProperty("timestamp") + ")"};
+                    return new String[]{
+                            props.getProperty("version") + " (built on " + props.getProperty("timestamp") + ")"
+                    };
                 } catch (IOException e) {
                     System.err.println("unable to load file " + name);
                 }
