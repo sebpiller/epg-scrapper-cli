@@ -39,9 +39,9 @@ stages
           echo env.BRANCH_NAME
 
           // Early abort if we run the pipeline on master.
-          if(env.BRANCH_NAME == "master") {
+          if( env.BRANCH_NAME == "master" || env.BRANCH_NAME == "main" ) {
               currentBuild.result = 'ABORTED'
-              error('Master branch is not meant to be built. It acts as a code reference of the latest production version.')
+              error(env.BRANCH_NAME + ' branch is not meant to be built. It acts as a code reference of the latest production version.')
           }
 
           def matcherRelease = env.BRANCH_NAME =~ /^release\/(.*)$/
@@ -54,7 +54,7 @@ stages
               env.BRANCH_TYPE = "release"
 
               env.RELEASE_VERSION = matcherRelease[0][1]
-              env.VERSIONING_OVERRIDE = "-Dbranch=" + env.RELEASE_VERSION + " -Drevision=.b$BUILD_NUMBER -Dmodifier="
+              env.VERSIONING_OVERRIDE = "-Dbranch=" + env.RELEASE_VERSION + " -Dfeature= -Drevision=.b$BUILD_NUMBER -Dmodifier="
           } else if(matcherFeature.matches()) {
               // Feature branches are tagged as snapshot of a particular name, with build number in it.
               echo "FEATURE BRANCH DETECTED!"
@@ -70,13 +70,13 @@ stages
               env.PR_NAME = matcherPr[0][1]
               env.VERSIONING_OVERRIDE = "-Dbranch=PR -Dfeature=." + env.PR_NAME + " -Drevision=.b$BUILD_NUMBER -Dmodifier=-SNAPSHOT"
           } else {
-              echo "REGULAR BRANCH DETECTED"
-              env.BRANCH_TYPE = "snapshot"
+              echo "OTHER BRANCH DETECTED"
+              env.BRANCH_TYPE = "other"
 
               env.VERSIONING_OVERRIDE = "-Dbranch=" + env.BRANCH_NAME + " -Drevision=.b$BUILD_NUMBER -Dmodifier=-SNAPSHOT"
           }
 
-          echo "  > VERSIONING_OVERRIDE settings: " + env.VERSIONING_OVERRIDE
+          echo "  > versioning settings: " + env.VERSIONING_OVERRIDE
        }
      }
    }
@@ -140,16 +140,10 @@ stages
              sh '''
                  mvn --batch-mode verify -DskipUTs -Dmaven.site.skip ${VERSIONING_OVERRIDE}
              '''
+             junit testResults: 'target/failsafe-reports/*.xml'
          }
       }
     }
-    post
-     {
-      always
-       {
-        junit testResults: 'target/failsafe-reports/*.xml'
-       }
-     }
   }
 
   stage('Documentation')
@@ -164,14 +158,8 @@ stages
              sh '''
                  mvn --batch-mode site ${VERSIONING_OVERRIDE}
              '''
+             publishHTML(target: [reportName: 'Site', reportDir: 'target/site', reportFiles: 'index.html', keepAll: false])
          }
-       }
-     }
-    post
-     {
-      always
-       {
-        publishHTML(target: [reportName: 'Site', reportDir: 'target/site', reportFiles: 'index.html', keepAll: false])
        }
      }
    }
