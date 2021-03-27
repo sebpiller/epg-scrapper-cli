@@ -42,10 +42,10 @@ stages
 
               if [ "${isRelease}" = "yes" ]
               then
-                  export relbr=`echo ${BRANCH} | sed -E '/release\\/(.*)/g'`
-                  echo "WE ARE CURRENTLY BUILDING RELEASE BRANCH for version ${relbr}"
+                  export relbr=$(echo ${BRANCH} | sed -r 's/(release\\/)(.*)/\\2/')
+                  echo "WE ARE CURRENTLY BUILDING RELEASE BRANCH for main version ${relbr} and build $BUILD_NUMBER"
               else
-                  echo "NOT IN A RELEASE BRANCH, SO NO RELEASE IS GOING TO BE BUILT"
+                  echo "NOT IN A RELEASE BRANCH, SO NO RELEASE IS GOING TO BE BUILT but we are building a version $BUILD_NUMBER"
               fi
           '''
        }
@@ -58,6 +58,7 @@ stages
      {
       script
        {
+          sh 'echo isRelease: $isRelease'
           sh 'mvn --batch-mode clean'
        }
      }
