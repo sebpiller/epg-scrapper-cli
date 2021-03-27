@@ -48,35 +48,49 @@ stages
           def matcherFeature = env.BRANCH_NAME =~ /^feature\/(.*)$/
           def matcherPr = env.BRANCH_NAME =~ /^pr\/(.*)$/
 
+          def versionOpts = ""
+          def docOpts = ""
+          env.DO_TAG = false
+
           if(matcherRelease.matches()) {
               // Release branches
               echo "RELEASE BRANCH DETECTED!"
               env.BRANCH_TYPE = "release"
+              env.DO_TAG = true
 
               env.RELEASE_VERSION = matcherRelease[0][1]
-              env.VERSIONING_OVERRIDE = "-Dbranch=" + env.RELEASE_VERSION + " -Dfeature= -Drevision=.b$BUILD_NUMBER -Dmodifier="
+              versionOpts = "-Dbranch=" + env.RELEASE_VERSION + " -Dfeature= -Drevision=.b$BUILD_NUMBER -Dmodifier="
           } else if(matcherFeature.matches()) {
               // Feature branches are tagged as snapshot of a particular name, with build number in it.
               echo "FEATURE BRANCH DETECTED!"
               env.BRANCH_TYPE = "feature"
+              env.DO_TAG = true
 
               env.FEATURE_NAME = matcherFeature[0][1]
-              env.VERSIONING_OVERRIDE = "-Dbranch=FEAT -Dfeature=." + env.FEATURE_NAME + " -Drevision=.b$BUILD_NUMBER -Dmodifier=-SNAPSHOT"
+              versionOpts = "-Dbranch=FEAT -Dfeature=." + env.FEATURE_NAME + " -Drevision=.b$BUILD_NUMBER -Dmodifier=-SNAPSHOT"
+              docOpts = "-Dmaven.site.skip"
           } else if(matcherPr.matches()) {
               // Pull requests branches are NOT deployed, NOT tagged and NO documentation is generated. Only tests are run.
               echo "PULL REQUEST BRANCH DETECTED!"
               env.BRANCH_TYPE = "pr"
 
               env.PR_NAME = matcherPr[0][1]
-              env.VERSIONING_OVERRIDE = "-Dbranch=PR -Dfeature=." + env.PR_NAME + " -Drevision=.b$BUILD_NUMBER -Dmodifier=-SNAPSHOT"
+              versionOpts = "-Dbranch=PR -Dfeature=." + env.PR_NAME + " -Drevision=.b$BUILD_NUMBER -Dmodifier=-SNAPSHOT"
+              docOpts = "-Dmaven.site.skip"
           } else {
               echo "OTHER BRANCH DETECTED"
               env.BRANCH_TYPE = "other"
 
-              env.VERSIONING_OVERRIDE = "-Dbranch=" + env.BRANCH_NAME + " -Drevision=.b$BUILD_NUMBER -Dmodifier=-SNAPSHOT"
+              versionOpts = "-Dbranch=" + env.BRANCH_NAME + " -Drevision=.b$BUILD_NUMBER -Dmodifier=-SNAPSHOT"
+              docOpts = "-Dmaven.site.skip"
           }
 
-          echo "  > versioning settings: " + env.VERSIONING_OVERRIDE
+          echo "  > versioning settings: " + versionOpts
+          echo "  > documentation settings: " + docOpts
+
+          env.MAVEN_ARGS = versionOpts + " " + docOpts
+
+
        }
      }
    }
@@ -88,7 +102,7 @@ stages
       script
        {
           sh '''
-              mvn --batch-mode clean ${VERSIONING_OVERRIDE}
+              mvn --batch-mode clean ${MAVEN_ARGS}
           '''
        }
      }
@@ -101,7 +115,7 @@ stages
       script
        {
           sh '''
-             mvn --batch-mode package -DskipUTs -DskipITs -Dmaven.site.skip ${VERSIONING_OVERRIDE}
+             mvn --batch-mode package -DskipUTs -DskipITs -Dmaven.site.skip ${MAVEN_ARGS}
           '''
        }
      }
@@ -115,7 +129,7 @@ stages
       script
        {
           sh '''
-             mvn --batch-mode verify -DskipITs -Dmaven.site.skip ${VERSIONING_OVERRIDE}
+             mvn --batch-mode verify -DskipITs -Dmaven.site.skip ${MAVEN_ARGS}
           '''
        }
      }
@@ -134,14 +148,10 @@ stages
     {
      script
       {
-         if(env.BRANCH_NAME == "develop") {
-             echo "Not running integration tests on branch " + env.BRANCH_NAME
-         } else {
-             sh '''
-                 mvn --batch-mode verify -DskipUTs -Dmaven.site.skip ${VERSIONING_OVERRIDE}
-             '''
-             junit testResults: 'target/failsafe-reports/*.xml'
-         }
+         sh '''
+             mvn --batch-mode verify -DskipUTs -Dmaven.site.skip ${MAVEN_ARGS}
+         '''
+         junit testResults: 'target/failsafe-reports/*.xml'
       }
     }
   }
@@ -152,14 +162,11 @@ stages
      {
       script
        {
-         if ( env.BRANCH_TYPE != "release") {
-             echo "Skip documentation for this kind of branch: " + env.BRANCH_TYPE
-         } else {
-             sh '''
-                 mvn --batch-mode site ${VERSIONING_OVERRIDE}
-             '''
-             publishHTML(target: [reportName: 'Site', reportDir: 'target/site', reportFiles: 'index.html', keepAll: false])
-         }
+
+         sh '''
+             mvn --batch-mode site ${MAVEN_ARGS}
+         '''
+         publishHTML(target: [reportName: 'Site', reportDir: 'target/site', reportFiles: 'index.html', keepAll: false])
        }
      }
    }
@@ -171,15 +178,15 @@ stages
      {
       script
        {
-         if ( env.BRANCH_TYPE != "release" && env.BRANCH_TYPE != "feature" ) {
-             echo "Skip tag for this kind of branch: " + env.BRANCH_TYPE
-
+         if ( env.DO_TAG ) {
              sh '''
-                 mvn --batch-mode deploy -DskipUTs -DskipITs ${VERSIONING_OVERRIDE}
+                 mvn --batch-mode deploy scm:tag -DskipUTs -DskipITs ${MAVEN_ARGS}
              '''
          } else {
+             echo "Skip and doc tag for this kind of branch: " + env.BRANCH_TYPE
+
              sh '''
-                 mvn --batch-mode deploy scm:tag -DskipUTs -DskipITs ${VERSIONING_OVERRIDE}
+                 mvn --batch-mode deploy -DskipUTs -DskipITs -Dmaven.site.skip ${MAVEN_ARGS}
              '''
          }
        }
