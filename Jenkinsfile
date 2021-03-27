@@ -41,22 +41,26 @@ stages
           def matcherPr = env.BRANCH_NAME =~ /^pr\/(.*)$/
 
           if(matcherRelease.matches()) {
+              // Release branches
               echo "RELEASE BRANCH DETECTED!"
               env.BRANCH_TYPE = "release"
 
               env.RELEASE_MAJ_MIN = matcherRelease[0][1]
               env.VERSIONING_OVERRIDE = "-Dbranch=" + env.RELEASE_MAJ_MIN + " -Drevision=.b$BUILD_NUMBER -Dmodifier="
           } else if(matcherFeature.matches()) {
+              // Feature branches are tagged as release of a particular name, with build number in it.
               echo "FEATURE BRANCH DETECTED!"
               env.BRANCH_TYPE = "feature"
 
               env.FEATURE_NAME = matcherFeature[0][1]
-              env.VERSIONING_OVERRIDE = "-Dfeature=." + env.FEATURE_NAME  + " -Drevision=.b$BUILD_NUMBER -Dmodifier="
+              env.VERSIONING_OVERRIDE = "-Dbranch= -Dfeature=" + env.FEATURE_NAME  + " -Drevision=.b$BUILD_NUMBER -Dmodifier="
           } else if(matcherPr.matches()) {
+              // Pull requests branches are NOT deployed, NOT tagged and NO documentation is generated. Only tests are runned.
               echo "PULL REQUEST BRANCH DETECTED!"
               env.BRANCH_TYPE = "pr"
 
-              env.VERSIONING_OVERRIDE = "-Dfeature=." + env.FEATURE_NAME  + " -Drevision=.b$BUILD_NUMBER -Dmodifier=-SNAPSHOT"
+              env.PR_NAME = matcherPr[0][1]
+              env.VERSIONING_OVERRIDE = "-Dbranch=PR -Dfeature=." + env.PR_NAME  + " -Drevision=.b$BUILD_NUMBER -Dmodifier=-SNAPSHOT"
           } else {
               echo "REGULAR BRANCH DETECTED"
               env.BRANCH_TYPE = "snapshot"
@@ -122,9 +126,13 @@ stages
     {
      script
       {
-         sh '''
-             mvn --batch-mode verify -DskipUTs -Dmaven.site.skip ${VERSIONING_OVERRIDE}
-         '''
+         if(env.BRANCH_NAME == "develop") {
+             echo "Not running integration tests on branch " + env.BRANCH_NAME
+         } else {
+             sh '''
+                 mvn --batch-mode verify -DskipUTs -Dmaven.site.skip ${VERSIONING_OVERRIDE}
+             '''
+         }
       }
     }
     post
@@ -142,9 +150,13 @@ stages
      {
       script
        {
-         sh '''
-             mvn --batch-mode site ${VERSIONING_OVERRIDE}
-         '''
+         if ( env.BRANCH_TYPE == "pr") {
+             echo "Not generating documentation for Pull Requests validation builds"
+         } else {
+             sh '''
+                 mvn --batch-mode site ${VERSIONING_OVERRIDE}
+             '''
+         }
        }
      }
     post
@@ -163,9 +175,13 @@ stages
      {
       script
        {
-         sh '''
-             mvn --batch-mode deploy scm:tag -DskipUTs -DskipITs ${VERSIONING_OVERRIDE}
-         '''
+         if ( env.BRANCH_TYPE == "pr") {
+             echo "Not deploying nor tagging for Pull Requests validation builds"
+         } else {
+             sh '''
+                 mvn --batch-mode deploy scm:tag -DskipUTs -DskipITs ${VERSIONING_OVERRIDE}
+             '''
+         }
        }
      }
    }
