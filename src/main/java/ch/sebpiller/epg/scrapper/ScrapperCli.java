@@ -35,7 +35,7 @@ import java.util.function.Function;
         header = {"spidy-tv-guide - epg scrapper - CLI"}
 )
 public final class ScrapperCli implements Callable<Integer> {
-    public static final String ARTIFACT_ID = "epg-scrapper";
+    public static final String ARTIFACT_ID = "epg-scrapper-cli";
     static ScrapperCli scrapperCli;
 
     private final Function<Integer, Void> exitCodeListener;
