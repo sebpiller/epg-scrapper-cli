@@ -14,7 +14,7 @@ tools
 
 options
  {
-  buildDiscarder(logRotator(numToKeepStr: '4'))
+  buildDiscarder(logRotator(numToKeepStr: '10'))
   skipStagesAfterUnstable()
   disableConcurrentBuilds()
  }
@@ -37,21 +37,38 @@ stages
       script
        {
           def matcherRelease = env.BRANCH_NAME =~ /^release\/(.*)$/
+          def matcherFeature = env.BRANCH_NAME =~ /^feature\/(.*)$/
+          def matcherPr = env.BRANCH_NAME =~ /^pr\/(.*)$/
 
           if(matcherRelease.matches()) {
-             env.BRANCH_TYPE = "release"
-             env.RELEASE_MAJ_MIN = matcherRelease[0][1]
+              // Release branches
+              echo "RELEASE BRANCH DETECTED!"
+              env.BRANCH_TYPE = "release"
 
-             env.VERSIONING_OVERRIDE = " -Dbranch=" + env.RELEASE_MAJ_MIN + " -Drevision=$BUILD_NUMBER -Dmodifier= "
+              env.RELEASE_MAJ_MIN = matcherRelease[0][1]
+              env.VERSIONING_OVERRIDE = "-Dbranch=" + env.RELEASE_MAJ_MIN + " -Drevision=.b$BUILD_NUMBER -Dmodifier="
+          } else if(matcherFeature.matches()) {
+              // Feature branches are tagged as release of a particular name, with build number in it.
+              echo "FEATURE BRANCH DETECTED!"
+              env.BRANCH_TYPE = "feature"
 
-             echo "RELEASE BRANCH DETECTED!"
+              env.FEATURE_NAME = matcherFeature[0][1]
+              env.VERSIONING_OVERRIDE = "-Dbranch= -Dfeature=" + env.FEATURE_NAME  + " -Drevision=.b$BUILD_NUMBER -Dmodifier="
+          } else if(matcherPr.matches()) {
+              // Pull requests branches are NOT deployed, NOT tagged and NO documentation is generated. Only tests are runned.
+              echo "PULL REQUEST BRANCH DETECTED!"
+              env.BRANCH_TYPE = "pr"
+
+              env.PR_NAME = matcherPr[0][1]
+              env.VERSIONING_OVERRIDE = "-Dbranch=PR -Dfeature=." + env.PR_NAME  + " -Drevision=.b$BUILD_NUMBER -Dmodifier=-SNAPSHOT"
           } else {
-             env.BRANCH_TYPE = "snapshot"
-             env.VERSIONING_OVERRIDE = " -Drevision=$BUILD_NUMBER -Dmodifier=-SNAPSHOT"
-             echo "NON-RELEASE BRANCH DETECTED"
+              echo "REGULAR BRANCH DETECTED"
+              env.BRANCH_TYPE = "snapshot"
+
+              env.VERSIONING_OVERRIDE = "-Dmodifier=-SNAPSHOT"
           }
 
-          echo "VERSIONING_OVERRIDE: " + env.VERSIONING_OVERRIDE
+          echo "  > VERSIONING_OVERRIDE settings: " + env.VERSIONING_OVERRIDE
        }
      }
    }
@@ -109,9 +126,13 @@ stages
     {
      script
       {
-         sh '''
-             mvn --batch-mode verify -DskipUTs -Dmaven.site.skip ${VERSIONING_OVERRIDE}
-         '''
+         if(env.BRANCH_NAME == "develop") {
+             echo "Not running integration tests on branch " + env.BRANCH_NAME
+         } else {
+             sh '''
+                 mvn --batch-mode verify -DskipUTs -Dmaven.site.skip ${VERSIONING_OVERRIDE}
+             '''
+         }
       }
     }
     post
@@ -129,9 +150,13 @@ stages
      {
       script
        {
-         sh '''
-             mvn --batch-mode site ${VERSIONING_OVERRIDE}
-         '''
+         if ( env.BRANCH_TYPE == "pr") {
+             echo "Not generating documentation for Pull Requests validation builds"
+         } else {
+             sh '''
+                 mvn --batch-mode site ${VERSIONING_OVERRIDE}
+             '''
+         }
        }
      }
     post
@@ -150,14 +175,12 @@ stages
      {
       script
        {
-         if(env.BRANCH_TYPE == "release") {
-           sh '''
-               mvn --batch-mode deploy scm:tag -DskipUTs -DskipITs ${VERSIONING_OVERRIDE}
-           '''
+         if ( env.BRANCH_TYPE == "pr") {
+             echo "Not deploying nor tagging for Pull Requests validation builds"
          } else {
-           sh '''
-               mvn --batch-mode deploy -DskipUTs -DskipITs ${VERSIONING_OVERRIDE}
-           '''
+             sh '''
+                 mvn --batch-mode deploy scm:tag -DskipUTs -DskipITs ${VERSIONING_OVERRIDE}
+             '''
          }
        }
      }
