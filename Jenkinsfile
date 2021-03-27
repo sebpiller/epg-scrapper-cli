@@ -36,6 +36,14 @@ stages
      {
       script
        {
+          echo env.BRANCH_NAME
+
+          // Early abort if we run the pipeline on master.
+          if(env.BRANCH_NAME == "master") {
+              currentBuild.result = 'ABORTED'
+              error('Master branch is not meant to be built. It acts as a code reference of the latest production version.')
+          }
+
           def matcherRelease = env.BRANCH_NAME =~ /^release\/(.*)$/
           def matcherFeature = env.BRANCH_NAME =~ /^feature\/(.*)$/
           def matcherPr = env.BRANCH_NAME =~ /^pr\/(.*)$/
@@ -45,27 +53,27 @@ stages
               echo "RELEASE BRANCH DETECTED!"
               env.BRANCH_TYPE = "release"
 
-              env.RELEASE_MAJ_MIN = matcherRelease[0][1]
-              env.VERSIONING_OVERRIDE = "-Dbranch=" + env.RELEASE_MAJ_MIN + " -Drevision=.b$BUILD_NUMBER -Dmodifier="
+              env.RELEASE_VERSION = matcherRelease[0][1]
+              env.VERSIONING_OVERRIDE = "-Dbranch=" + env.RELEASE_VERSION + " -Drevision=.b$BUILD_NUMBER -Dmodifier="
           } else if(matcherFeature.matches()) {
-              // Feature branches are tagged as release of a particular name, with build number in it.
+              // Feature branches are tagged as snapshot of a particular name, with build number in it.
               echo "FEATURE BRANCH DETECTED!"
               env.BRANCH_TYPE = "feature"
 
               env.FEATURE_NAME = matcherFeature[0][1]
-              env.VERSIONING_OVERRIDE = "-Dbranch= -Dfeature=" + env.FEATURE_NAME  + " -Drevision=.b$BUILD_NUMBER -Dmodifier="
+              env.VERSIONING_OVERRIDE = "-Dbranch=FEAT -Dfeature=." + env.FEATURE_NAME + " -Drevision=.b$BUILD_NUMBER -Dmodifier=-SNAPSHOT"
           } else if(matcherPr.matches()) {
-              // Pull requests branches are NOT deployed, NOT tagged and NO documentation is generated. Only tests are runned.
+              // Pull requests branches are NOT deployed, NOT tagged and NO documentation is generated. Only tests are run.
               echo "PULL REQUEST BRANCH DETECTED!"
               env.BRANCH_TYPE = "pr"
 
               env.PR_NAME = matcherPr[0][1]
-              env.VERSIONING_OVERRIDE = "-Dbranch=PR -Dfeature=." + env.PR_NAME  + " -Drevision=.b$BUILD_NUMBER -Dmodifier=-SNAPSHOT"
+              env.VERSIONING_OVERRIDE = "-Dbranch=PR -Dfeature=." + env.PR_NAME + " -Drevision=.b$BUILD_NUMBER -Dmodifier=-SNAPSHOT"
           } else {
               echo "REGULAR BRANCH DETECTED"
               env.BRANCH_TYPE = "snapshot"
 
-              env.VERSIONING_OVERRIDE = "-Dmodifier=-SNAPSHOT"
+              env.VERSIONING_OVERRIDE = "-Dbranch=" + env.BRANCH_NAME + " -Drevision=.b$BUILD_NUMBER -Dmodifier=-SNAPSHOT"
           }
 
           echo "  > VERSIONING_OVERRIDE settings: " + env.VERSIONING_OVERRIDE
@@ -150,8 +158,8 @@ stages
      {
       script
        {
-         if ( env.BRANCH_TYPE == "pr") {
-             echo "Not generating documentation for Pull Requests validation builds"
+         if ( env.BRANCH_TYPE != "release") {
+             echo "Skip documentation for this kind of branch: " + env.BRANCH_TYPE
          } else {
              sh '''
                  mvn --batch-mode site ${VERSIONING_OVERRIDE}
@@ -175,8 +183,12 @@ stages
      {
       script
        {
-         if ( env.BRANCH_TYPE == "pr") {
-             echo "Not deploying nor tagging for Pull Requests validation builds"
+         if ( env.BRANCH_TYPE != "release" && env.BRANCH_TYPE != "feature" ) {
+             echo "Skip tag for this kind of branch: " + env.BRANCH_TYPE
+
+             sh '''
+                 mvn --batch-mode deploy -DskipUTs -DskipITs ${VERSIONING_OVERRIDE}
+             '''
          } else {
              sh '''
                  mvn --batch-mode deploy scm:tag -DskipUTs -DskipITs ${VERSIONING_OVERRIDE}
