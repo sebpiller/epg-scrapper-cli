@@ -3,13 +3,16 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ch.sebpiller</groupId>
-    <artifactId>epg-scrapper</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <artifactId>epg-scrapper-cli</artifactId>
+    <version>${revision}</version>
+    <name>EPG Scrapper CLI</name>
     <description>A project to scrape EPG (Electronic Program Guide) information from various sources, to populate
         eg. TVHeadend EPG.
     </description>
 
     <properties>
+        <revision>1.1.0-SNAPSHOT</revision>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -17,6 +20,8 @@
 
         <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
+
+        <jacoco.mincoverage>50%</jacoco.mincoverage>
 
         <timestamp>${maven.build.timestamp}</timestamp>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
@@ -300,7 +305,7 @@
                                             <limit>
                                                 <counter>LINE</counter>
                                                 <value>COVEREDRATIO</value>
-                                                <minimum>50%</minimum>
+                                                <minimum>${jacoco.mincoverage}</minimum>
                                             </limit>
                                         </limits>
                                     </rule>
@@ -325,7 +330,7 @@
                                             <limit>
                                                 <counter>LINE</counter>
                                                 <value>COVEREDRATIO</value>
-                                                <minimum>50%</minimum>
+                                                <minimum>${jacoco.mincoverage}</minimum>
                                             </limit>
                                         </limits>
                                     </rule>
@@ -524,14 +529,16 @@
                     <version>3.9.1</version>
                     <executions>
                         <execution>
-                            <id>pack-site</id>
+                            <id>build-site</id>
                             <goals>
                                 <goal>site</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>pack-site</id>
+                            <goals>
                                 <goal>jar</goal>
                             </goals>
-                            <configuration>
-                                <attach>true</attach>
-                            </configuration>
                         </execution>
                     </executions>
                 </plugin>
@@ -608,6 +615,37 @@
                     </reportSet>
                 </reportSets>
             </plugin>
+
+            <plugin>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>index</report>
+                            <report>summary</report>
+                            <report>mailing-lists</report>
+                            <report>team</report>
+                            <report>scm</report>
+
+                            <report>modules</report>
+                            <report>licenses</report>
+
+                            <report>issue-management</report>
+                            <report>ci-management</report>
+                            <report>distribution-management</report>
+
+                            <report>plugins</report>
+                            <report>plugin-management</report>
+
+                            <report>dependencies</report>
+                            <report>dependency-convergence</report>
+                            <report>dependency-info</report>
+                            <report>dependency-management</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+
 
             <plugin>
                 <groupId>org.jacoco</groupId>

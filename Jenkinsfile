@@ -42,7 +42,7 @@ stages
      {
       script
        {
-          sh 'mvn --batch-mode compile'
+          sh 'mvn --batch-mode package -DskipUTs -DskipITs -Dmaven.site.skip'
        }
      }
    }
@@ -54,7 +54,7 @@ stages
      {
       script
        {
-          sh 'mvn --batch-mode verify -DskipITs'
+          sh 'mvn --batch-mode verify -DskipITs -Dmaven.site.skip'
        }
      }
     post
@@ -72,7 +72,7 @@ stages
     {
      script
       {
-         sh 'mvn --batch-mode verify -DskipUTs'
+         sh 'mvn --batch-mode verify -DskipUTs -Dmaven.site.skip'
       }
     }
     post
@@ -90,7 +90,7 @@ stages
      {
       script
        {
-         sh 'mvn --batch-mode site -DskipUTs -DskipITs'
+         sh 'mvn --batch-mode site'
        }
      }
     post
@@ -102,13 +102,14 @@ stages
      }
    }
 
+
   stage('Deploy artifacts')
    {
     steps
      {
       script
        {
-          sh 'mvn --batch-mode deploy -DskipUTs -DskipITs -X'
+          sh 'mvn --batch-mode deploy -DskipUTs -DskipITs -Dmaven.site.skip'
        }
      }
    }
