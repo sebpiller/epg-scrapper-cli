@@ -36,14 +36,22 @@ stages
      {
       script
        {
-          echo BRANCH
-          def matcherRelease = BRANCH =~ /^release\/(.*)$/
+          def matcherRelease = env.BRANCH_NAME =~ /^release\/(.*)$/
 
           if(matcherRelease.matches()) {
-             echo "we are in a release ! " + matcherRelease[0][1]
+             env.BRANCH_TYPE = "release"
+             env.RELEASE_MAJ_MIN = matcherRelease[0][1]
+
+             env.VERSIONING_OVERRIDE = " -Dbranch=" + env.RELEASE_MAJ_MIN + " -Drevision=$BUILD_NUMBER -Dmodifier= "
+
+             echo "RELEASE BRANCH DETECTED!"
           } else {
-           echo "too bad dude, not in a release...."
+             env.BRANCH_TYPE = "snapshot"
+             env.VERSIONING_OVERRIDE = " -Drevision=$BUILD_NUMBER -Dmodifier=-SNAPSHOT"
+             echo "NON-RELEASE BRANCH DETECTED"
           }
+
+          echo "VERSIONING_OVERRIDE: " + env.VERSIONING_OVERRIDE
        }
      }
    }
@@ -54,8 +62,9 @@ stages
      {
       script
        {
-          sh 'echo isRelease: $isRelease'
-          sh 'mvn --batch-mode clean'
+          sh '''
+              mvn --batch-mode clean ${VERSIONING_OVERRIDE}
+          '''
        }
      }
    }
@@ -66,7 +75,9 @@ stages
      {
       script
        {
-          sh 'mvn --batch-mode package -DskipUTs -DskipITs -Dmaven.site.skip'
+          sh '''
+             mvn --batch-mode package -DskipUTs -DskipITs -Dmaven.site.skip ${VERSIONING_OVERRIDE}
+          '''
        }
      }
    }
@@ -78,7 +89,9 @@ stages
      {
       script
        {
-          sh 'mvn --batch-mode verify -DskipITs -Dmaven.site.skip'
+          sh '''
+             mvn --batch-mode verify -DskipITs -Dmaven.site.skip ${VERSIONING_OVERRIDE}
+          '''
        }
      }
     post
@@ -96,7 +109,9 @@ stages
     {
      script
       {
-         sh 'mvn --batch-mode verify -DskipUTs -Dmaven.site.skip'
+         sh '''
+             mvn --batch-mode verify -DskipUTs -Dmaven.site.skip ${VERSIONING_OVERRIDE}
+         '''
       }
     }
     post
@@ -114,7 +129,9 @@ stages
      {
       script
        {
-         sh 'mvn --batch-mode site'
+         sh '''
+             mvn --batch-mode site ${VERSIONING_OVERRIDE}
+         '''
        }
      }
     post
@@ -133,19 +150,15 @@ stages
      {
       script
        {
-          sh '''
-              # check for release branch
-              if [[ "${BRANCH}" == release/* ]]
-              then
-                  echo "RELEASE BRANCH DETECTED"
-                  brid = ${BRANCH#*/}
-                  echo "branch version id: $brid"
-                  mvn --batch-mode deploy scm:tag -Dbranch=$brid -Drevision=$BUILD_NUMBER -Dmodifier= -DskipUTs -DskipITs -Dmaven.site.skip
-              else
-                  echo "STANDARD BRANCH DETECTED"
-                  mvn --batch-mode deploy scm:tag -Drevision=$BUILD_NUMBER -DskipUTs -DskipITs -Dmaven.site.skip
-              fi
-          '''
+         if(env.BRANCH_TYPE == "release") {
+           sh '''
+               mvn --batch-mode deploy scm:tag -DskipUTs -DskipITs ${VERSIONING_OVERRIDE}
+           '''
+         } else {
+           sh '''
+               mvn --batch-mode deploy -DskipUTs -DskipITs ${VERSIONING_OVERRIDE}
+           '''
+         }
        }
      }
    }
