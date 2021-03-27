@@ -6,6 +6,7 @@ import ch.sebpiller.epg.scrapper.programmetvnet.ProgrammeTvNetEpgScrapper;
 import ch.sebpiller.epg.scrapper.tsr.RtsEpgScrapper;
 import ch.sebpiller.epg.scrapper.tvsearchch.TvSearchCh;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
@@ -21,22 +22,23 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.function.Function;
 
 @Command(
         name = "java -jar epg-scrapper.jar",
-        footer = "NO Copyright - 2020",
+        footer = "NO Copyright - 2021",
         description = "Fetch data from multiple sources to populate an EPG.",
         sortOptions = false,
         versionProvider = ScrapperCli.VersionProvider.class,
         header = {"spidy-tv-guide - epg scrapper - CLI"}
 )
-public class ScrapperCli implements Callable<Integer> {
+public final class ScrapperCli implements Callable<Integer> {
     public static final String ARTIFACT_ID = "epg-scrapper";
+    static ScrapperCli scrapperCli;
+
+    private final Function<Integer, Void> exitCodeListener;
 
     static class VersionProvider implements CommandLine.IVersionProvider {
         @Override
@@ -55,9 +57,13 @@ public class ScrapperCli implements Callable<Integer> {
                     Properties props = new Properties();
                     props.load(is);
 
-                    assert props.getProperty("artifact").equals(ARTIFACT_ID);
+                    Validate.isTrue(
+                            ARTIFACT_ID.equals(props.getProperty("artifact")),
+                            "version file does not reference artifact " + ARTIFACT_ID);
 
-                    return new String[]{props.getProperty("version") + " (built on " + props.getProperty("timestamp") + ")"};
+                    return new String[]{
+                            props.getProperty("version") + " (built on " + props.getProperty("timestamp") + ")"
+                    };
                 } catch (IOException e) {
                     System.err.println("unable to load file " + name);
                 }
@@ -67,7 +73,7 @@ public class ScrapperCli implements Callable<Integer> {
         }
     }
 
-    private String getVersion() {
+    String getVersion() {
         return new VersionProvider().getVersion()[0];
     }
 
@@ -90,13 +96,26 @@ public class ScrapperCli implements Callable<Integer> {
     )
     private String cliParamOutput;
 
-    private ScrapperCli() {
+    ScrapperCli() {
+        this.exitCodeListener = exitCode -> {
+            System.exit(exitCode);
+            return null;
+        };
+    }
+
+    ScrapperCli(Function<Integer, Void> exitCodeListener) {
+        this.exitCodeListener = Objects.requireNonNull(exitCodeListener);
     }
 
     public static void main(String[] args) {
+        // For testability: create an instance of this class only if none has been provided by tests.
+        if (scrapperCli == null) {
+            scrapperCli = new ScrapperCli();
+        }
+
         int exitCode = 0;
 
-        CommandLine commandLine = new CommandLine(new ScrapperCli());
+        CommandLine commandLine = new CommandLine(scrapperCli);
 
         try {
             commandLine.parseArgs(args);
@@ -115,7 +134,7 @@ public class ScrapperCli implements Callable<Integer> {
         }
 
         LOG.info("exiting with exit code {}", exitCode);
-        System.exit(exitCode);
+        scrapperCli.exitCodeListener.apply(exitCode);
     }
 
     private int i;

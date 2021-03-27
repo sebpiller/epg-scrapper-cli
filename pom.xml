@@ -3,13 +3,16 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ch.sebpiller</groupId>
-    <artifactId>epg-scrapper</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <artifactId>epg-scrapper-cli</artifactId>
+    <version>${revision}</version>
+    <name>EPG Scrapper CLI</name>
     <description>A project to scrape EPG (Electronic Program Guide) information from various sources, to populate
         eg. TVHeadend EPG.
     </description>
 
     <properties>
+        <revision>1.1.0-SNAPSHOT</revision>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -18,8 +21,19 @@
         <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
 
+        <jacoco.mincoverage>50%</jacoco.mincoverage>
+
         <timestamp>${maven.build.timestamp}</timestamp>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
+
+        <hibernate-validator.version>6.2.0.Final</hibernate-validator.version>
+        <kotlin.version>1.4.32</kotlin.version>
+        <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
+        <skipUTs>false</skipUTs>
+        <failIfNoTests>true</failIfNoTests>
+
+        <surefire.jacoco.args/>
+        <failsafe.jacoco.args/>
     </properties>
 
     <developers>
@@ -30,6 +44,13 @@
             <organization>none</organization>
             <timezone>GMT+1</timezone>
             <url>https://github.com/sebpiller</url>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <properties>
+                <picUrl>https://fr.gravatar.com/userimage/203993716/6f8cf03f83f3f97a2e7b67834061a745.jpg?size=200
+                </picUrl>
+            </properties>
         </developer>
     </developers>
 
@@ -40,41 +61,24 @@
         <tag>HEAD</tag>
     </scm>
 
-    <distributionManagement>
-        <repository>
-            <id>spidybox-release</id>
-            <url>http://nexus.home/repository/maven-releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>spidybox-snapshots</id>
-            <url>http://nexus.home/repository/maven-snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
-
     <dependencies>
-<!--        <dependency>-->
-<!--            <groupId>junit</groupId>-->
-<!--            <artifactId>junit</artifactId>-->
-<!--            <version>4.13.1</version>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.4.0</version>
+            <version>5.7.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.17.2</version>
+            <version>3.19.0</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.30</version>
+            <version>1.7.25</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -82,11 +86,10 @@
             <version>1.2.3</version>
         </dependency>
 
-
         <dependency>
             <groupId>info.picocli</groupId>
             <artifactId>picocli</artifactId>
-            <version>4.5.1</version>
+            <version>4.6.1</version>
         </dependency>
         <dependency>
             <groupId>javax.validation</groupId>
@@ -96,17 +99,17 @@
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>6.1.6.Final</version>
+            <version>${hibernate-validator.version}</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator-annotation-processor</artifactId>
-            <version>6.1.6.Final</version>
+            <version>${hibernate-validator.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.el</groupId>
             <artifactId>javax.el-api</artifactId>
-            <version>3.0.0</version>
+            <version>2.2.5</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.web</groupId>
@@ -118,7 +121,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.11</version>
+            <version>3.12.0</version>
         </dependency>
         <dependency>
             <groupId>org.jsoup</groupId>
@@ -131,10 +134,15 @@
             <version>3.0.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib</artifactId>
+            <version>${kotlin.version}</version>
+        </dependency>
     </dependencies>
 
-
     <build>
+        <!-- create version infos in a format easily read by code -->
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -152,39 +160,526 @@
             </resource>
         </resources>
 
-
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <!-- surefire 3.x required for junit 5 -->
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <version>3.0.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>3.1.1</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>3.0.0-M1</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.2.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>3.2.0</version>
+                </plugin>
+
+                <!-- deploy 2.8.x required to have distribution management configured in settings.xml instead of pom -->
+                <plugin>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>2.8.2</version>
+                    <!--<version>3.0.0-M1</version> see https://issues.apache.org/jira/browse/MDEPLOY-244-->
+                </plugin>
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>versions-maven-plugin</artifactId>
+                    <version>2.8.1</version>
+                </plugin>
+
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>3.0.0-M3</version>
+                    <executions>
+                        <execution>
+                            <id>enforce-maven</id>
+                            <goals>
+                                <goal>enforce</goal>
+                            </goals>
+                            <configuration>
+                                <rules>
+                                    <requireMavenVersion>
+                                        <version>3.1.0</version>
+                                    </requireMavenVersion>
+                                </rules>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-project-info-reports-plugin</artifactId>
+                    <version>3.1.1</version>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>3.1.2</version>
+                    <configuration>
+                        <configLocation>${project.basedir}/checkstyle_custom.xml</configLocation>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>8.32</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.8.6</version>
+                    <executions>
+                        <!-- Surefire -->
+                        <execution>
+                            <id>before-unit-test-execution</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                            <configuration>
+                                <append>false</append>
+                                <destFile>${project.build.directory}/UT-coverage.jacoco</destFile>
+                                <propertyName>surefire.jacoco.args</propertyName>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>after-unit-test-execution</id>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                            <configuration>
+                                <dataFile>${project.build.directory}/UT-coverage.jacoco</dataFile>
+                                <outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
+                            </configuration>
+                        </execution>
+
+                        <!-- Failsafe -->
+                        <execution>
+                            <id>before-integration-test-execution</id>
+                            <phase>pre-integration-test</phase>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                            <configuration>
+                                <append>false</append>
+                                <destFile>${project.build.directory}/IT-coverage.jacoco</destFile>
+                                <propertyName>failsafe.jacoco.args</propertyName>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>after-integration-test-execution</id>
+                            <phase>post-integration-test</phase>
+                            <goals>
+                                <goal>report-integration</goal>
+                            </goals>
+                            <configuration>
+                                <dataFile>${project.build.directory}/IT-coverage.jacoco</dataFile>
+                                <outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
+                            </configuration>
+                        </execution>
+
+                        <!-- Code coverage threshold -->
+                        <execution>
+                            <id>check-UT-coverage</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                            <configuration>
+                                <rules>
+                                    <rule>
+                                        <excludes>
+                                            <exclude>*Test</exclude>
+                                        </excludes>
+                                        <limits>
+                                            <limit>
+                                                <counter>LINE</counter>
+                                                <value>COVEREDRATIO</value>
+                                                <minimum>${jacoco.mincoverage}</minimum>
+                                            </limit>
+                                        </limits>
+                                    </rule>
+                                </rules>
+                                <dataFile>${project.build.directory}/UT-coverage.jacoco</dataFile>
+                            </configuration>
+                        </execution>
+
+                        <execution>
+                            <id>check-IT-coverage</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                            <configuration>
+                                <rules>
+                                    <rule>
+                                        <excludes>
+                                            <exclude>*Test</exclude>
+                                        </excludes>
+                                        <limits>
+                                            <limit>
+                                                <counter>LINE</counter>
+                                                <value>COVEREDRATIO</value>
+                                                <minimum>${jacoco.mincoverage}</minimum>
+                                            </limit>
+                                        </limits>
+                                    </rule>
+                                </rules>
+                                <dataFile>${project.build.directory}/IT-coverage.jacoco</dataFile>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>3.3.0</version>
+                    <configuration>
+                        <archive>
+                            <manifest>
+                                <mainClass>ch.sebpiller.epg.scrapper.ScrapperCli</mainClass>
+                            </manifest>
+                        </archive>
+                        <descriptorRefs>
+                            <descriptorRef>jar-with-dependencies</descriptorRef>
+                        </descriptorRefs>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <phase>install</phase>
+                            <goals>
+                                <goal>single</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>3.1.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.1</version>
+                    <executions>
+                        <!-- Replacing default-compile as it is treated specially by maven -->
+                        <execution>
+                            <id>default-compile</id>
+                            <phase>none</phase>
+                        </execution>
+                        <!-- Replacing default-testCompile as it is treated specially by maven -->
+                        <execution>
+                            <id>default-testCompile</id>
+                            <phase>none</phase>
+                        </execution>
+                        <execution>
+                            <id>java-compile</id>
+                            <phase>compile</phase>
+                            <goals>
+                                <goal>compile</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>java-test-compile</id>
+                            <phase>test-compile</phase>
+                            <goals>
+                                <goal>testCompile</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.jetbrains.kotlin</groupId>
+                    <artifactId>kotlin-maven-plugin</artifactId>
+                    <version>${kotlin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>compile</id>
+                            <goals>
+                                <goal>compile</goal>
+                            </goals>
+                            <configuration>
+                                <sourceDirs>
+                                    <sourceDir>${project.basedir}/src/main/kotlin</sourceDir>
+                                    <sourceDir>${project.basedir}/src/main/java</sourceDir>
+                                </sourceDirs>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>test-compile</id>
+                            <goals>
+                                <goal>test-compile</goal>
+                            </goals>
+                            <configuration>
+                                <sourceDirs>
+                                    <sourceDir>${project.basedir}/src/test/kotlin</sourceDir>
+                                    <sourceDir>${project.basedir}/src/test/java</sourceDir>
+                                </sourceDirs>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>integration-test-compile</id>
+                            <goals>
+                                <goal>test-compile</goal>
+                            </goals>
+                            <configuration>
+                                <sourceDirs>
+                                    <sourceDir>${project.basedir}/src/it/kotlin</sourceDir>
+                                    <sourceDir>${project.basedir}/src/it/java</sourceDir>
+                                </sourceDirs>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>3.2.0</version>
+                    <executions>
+                        <execution>
+                            <id>add-integration-test-source</id>
+                            <phase>generate-test-sources</phase>
+                            <goals>
+                                <goal>add-test-source</goal>
+                            </goals>
+                            <configuration>
+                                <sources>
+                                    <source>src/it/java</source>
+                                </sources>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>add-integration-test-resource</id>
+                            <phase>generate-test-resources</phase>
+                            <goals>
+                                <goal>add-test-resource</goal>
+                            </goals>
+                            <configuration>
+                                <resources>
+                                    <resource>
+                                        <directory>src/it/resources</directory>
+                                    </resource>
+                                </resources>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <!-- surefire 3.x required for junit 5 -->
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>3.0.0-M5</version>
+
+                    <configuration>
+                        <argLine>@{surefire.jacoco.args}</argLine>
+                        <skipTests>${skipUTs}</skipTests>
+                        <excludes>
+                            <!-- Do not process integration tests with surefire. Failsafe will do the job -->
+                            <exclude>**/*IntegrationTest.java</exclude>
+                        </excludes>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>3.0.0-M5</version>
+
+                    <configuration>
+                        <!-- beware of timeouts -->
+                        <forkedProcessTimeoutInSeconds>0</forkedProcessTimeoutInSeconds>
+                        <forkedProcessExitTimeoutInSeconds>0</forkedProcessExitTimeoutInSeconds>
+                        <testSourceDirectory>${project.basedir}/src/it/java</testSourceDirectory>
+                        <includes>
+                            <include>**/*IntegrationTest.java</include>
+                        </includes>
+                        <argLine>@{failsafe.jacoco.args}</argLine>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>run-integration-test</id>
+                            <phase>integration-test</phase>
+                            <goals>
+                                <goal>integration-test</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>verify-integration-test</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>3.9.1</version>
+                    <executions>
+                        <execution>
+                            <id>build-site</id>
+                            <goals>
+                                <goal>site</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>pack-site</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
+
         <plugins>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <artifactId>maven-enforcer-plugin</artifactId>
+            </plugin>
+            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <artifactId>maven-failsafe-plugin</artifactId>
+            </plugin>
+
+        </plugins>
+
+    </build>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>4.2.2</version>
                 <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>ch.sebpiller.epg.scrapper.ScrapperCli</mainClass>
-                        </manifest>
-                    </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
+                    <xmlOutput>true</xmlOutput>
+                    <xmlOutputDirectory>target/site</xmlOutputDirectory>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>2.8.1</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>dependency-updates-report</report>
+                            <report>plugin-updates-report</report>
+                            <report>property-updates-report</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>checkstyle</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>index</report>
+                            <report>summary</report>
+                            <report>mailing-lists</report>
+                            <report>team</report>
+                            <report>scm</report>
+
+                            <report>modules</report>
+                            <report>licenses</report>
+
+                            <report>issue-management</report>
+                            <report>ci-management</report>
+                            <report>distribution-management</report>
+
+                            <report>plugins</report>
+                            <report>plugin-management</report>
+
+                            <report>dependencies</report>
+                            <report>dependency-convergence</report>
+                            <report>dependency-info</report>
+                            <report>dependency-management</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <configuration>
+                    <append>false</append>
+                    <dataFile>${project.build.directory}/UT-coverage.jacoco</dataFile>
+                </configuration>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>report</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <configuration>
+                    <append>false</append>
+                    <dataFile>${project.build.directory}/IT-coverage.jacoco</dataFile>
+                </configuration>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>report-integration</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
         </plugins>
-    </build>
+    </reporting>
 </project>

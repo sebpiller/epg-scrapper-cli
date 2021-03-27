@@ -214,8 +214,7 @@ public class RtsEpgScrapper implements EpgScrapper {
                 }
 
                 // notify callback
-                EpgInfo info = new EpgInfo();
-                info.setChannel(channel);
+                EpgInfo info = new EpgInfo(channel);
                 info.setTimeStart(start);
                 info.setTitle(title);
                 info.setSubtitle(subtitle);
@@ -230,7 +229,7 @@ public class RtsEpgScrapper implements EpgScrapper {
         }
     }
 
-    private void parseDetails(String detailUriId, EpgInfo info) {
+    void parseDetails(String detailUriId, EpgInfo info) {
         Document doc;
         try {
             doc = Jsoup.connect(DETAILS_URL + '/' + detailUriId).get();
