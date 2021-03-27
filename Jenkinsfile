@@ -36,7 +36,7 @@ stages
      {
       script
        {
-          echo env.BRANCH_NAME
+          echo "Current branch: " + env.BRANCH_NAME
 
           // Early abort if we run the pipeline on master.
           if( env.BRANCH_NAME == "master" || env.BRANCH_NAME == "main" ) {
@@ -46,7 +46,7 @@ stages
 
           def matcherRelease = env.BRANCH_NAME =~ /^release\/(.*)$/
           def matcherFeature = env.BRANCH_NAME =~ /^feature\/(.*)$/
-          def matcherPr = env.BRANCH_NAME =~ /^pr\/(.*)$/
+          def matcherPr = env.BRANCH_NAME =~ /^PR-.*$/
 
           def versionOpts = ""
           def docOpts = ""
