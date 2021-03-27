@@ -68,7 +68,7 @@ stages
 
               env.FEATURE_NAME = matcherFeature[0][1]
               versionOpts = "-Dbranch=FEAT -Dfeature=." + env.FEATURE_NAME + " -Drevision=.b$BUILD_NUMBER -Dmodifier=-SNAPSHOT"
-              docOpts = "-Dmaven.site.skip"
+              mvnOpts = "-Dmaven.site.skip"
           } else if(matcherPr.matches()) {
               // Pull requests branches are NOT deployed, NOT tagged and NO documentation is generated. Only tests are run.
               echo "PULL REQUEST BRANCH DETECTED!"
@@ -76,19 +76,25 @@ stages
 
               env.PR_NAME = matcherPr[0][1]
               versionOpts = "-Dbranch=PR -Dfeature=." + env.PR_NAME + " -Drevision=.b$BUILD_NUMBER -Dmodifier=-SNAPSHOT"
-              docOpts = "-Dmaven.site.skip"
+              mvnOpts = "-Dmaven.site.skip"
+          } else if(env.BRANCH_NAME == "develop") {
+              echo "DEVELOP BRANCH DETECTED"
+              env.BRANCH_TYPE = "develop"
+
+              versionOpts = "-Dbranch=" + env.BRANCH_NAME + " -Drevision=.b$BUILD_NUMBER -Dmodifier=-SNAPSHOT"
+              mvnOpts = "-Dmaven.site.skip -DskipITs"
           } else {
               echo "OTHER BRANCH DETECTED"
               env.BRANCH_TYPE = "other"
 
               versionOpts = "-Dbranch=" + env.BRANCH_NAME + " -Drevision=.b$BUILD_NUMBER -Dmodifier=-SNAPSHOT"
-              docOpts = "-Dmaven.site.skip"
+              mvnOpts = "-Dmaven.site.skip"
           }
 
           echo "  > versioning settings: " + versionOpts
-          echo "  > documentation settings: " + docOpts
+          echo "  > maven settings: " + mvnOpts
 
-          env.MAVEN_ARGS = versionOpts + " " + docOpts
+          env.MAVEN_ARGS = versionOpts + " " + mvnOpts
 
 
        }
