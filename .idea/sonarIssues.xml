@@ -3,7 +3,17 @@
   <component name="issues">
     <option name="index">
       <map>
+        <entry key="$PROJECT_DIR$/Jenkinsfile">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/README.md">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/pom.xml">
           <value>
             <set />
           </value>
@@ -19,6 +29,31 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/../metronome/pom.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../metronome/pom2.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../metronome/src/it/java/ch/sebpiller/metronome/Metronome2_IntegrationTest.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../metronome/src/it/java/ch/sebpiller/metronome/MetronomeIntegrationTest.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../metronome/src/test/java/ch/sebpiller/metronome/MetronomeTest.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../smart-lamp/pom.xml">
           <value>
             <set />
           </value>

@@ -309,7 +309,7 @@
                             <id>before-integration-test-execution</id>
                             <phase>pre-integration-test</phase>
                             <goals>
-                                <goal>prepare-agent</goal>
+                                <goal>prepare-agent-integration</goal>
                             </goals>
                             <configuration>
                                 <append>false</append>

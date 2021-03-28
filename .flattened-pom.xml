@@ -45,7 +45,7 @@
     <revision></revision>
     <maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
     <feature></feature>
-    <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
+    <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ssZ</maven.build.timestamp.format>
     <hibernate-validator.version>6.2.0.Final</hibernate-validator.version>
     <skipITs>false</skipITs>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -98,7 +98,7 @@
     <dependency>
       <groupId>javax.el</groupId>
       <artifactId>javax.el-api</artifactId>
-      <version>2.2.5</version>
+      <version>3.0.0</version>
     </dependency>
     <dependency>
       <groupId>org.glassfish.web</groupId>
@@ -273,7 +273,7 @@
               <id>before-integration-test-execution</id>
               <phase>pre-integration-test</phase>
               <goals>
-                <goal>prepare-agent</goal>
+                <goal>prepare-agent-integration</goal>
               </goals>
               <configuration>
                 <append>false</append>
