@@ -39,7 +39,8 @@ stages
           echo "Current branch: " + env.BRANCH_NAME
           env.DO_TAG = false
           env.SKIP_IT = false
-          env.DOCKER = false
+          env.BUILD_DOCKER = false
+          env.DOCKER_TAG = "latest"
 
           // Early abort if we run the pipeline on master.
           if( env.BRANCH_NAME == "master" || env.BRANCH_NAME == "main" ) {
@@ -59,10 +60,12 @@ stages
               echo "RELEASE BRANCH DETECTED!"
               env.BRANCH_TYPE = "release"
               env.DO_TAG = true
-              env.DOCKER = true
+              env.BUILD_DOCKER = true
 
               env.RELEASE_VERSION = matcherRelease[0][1]
+
               versionOpts = "-Dbranch=" + env.RELEASE_VERSION + " -Dfeature= -Drevision=.b$BUILD_NUMBER -Dmodifier="
+              env.DOCKER_TAG = env.RELEASE_VERSION + ".b$BUILD_NUMBER"
           } else if(matcherFeature.matches()) {
               // Feature branches are tagged as snapshot of a particular name, with build number in it.
               echo "FEATURE BRANCH DETECTED!"
@@ -211,9 +214,9 @@ stages
      {
       script
        {
-         if ( env.DOCKER ) {
+         if ( env.BUILD_DOCKER ) {
              sh '''
-                 docker buildx build --platform linux/arm64,linux/arm/v7 --push -t sebpiller/epg-scrapper .
+                 docker buildx build --platform linux/arm64,linux/arm/v7 --push -t sebpiller/epg-scrapper:${DOCKER_TAG} .
              '''
          } else {
              echo "No docker push for this kind of branch: " + env.BRANCH_TYPE
