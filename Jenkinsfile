@@ -37,6 +37,8 @@ stages
       script
        {
           echo "Current branch: " + env.BRANCH_NAME
+          env.DO_TAG = false
+          env.SKIP_IT = false
 
           // Early abort if we run the pipeline on master.
           if( env.BRANCH_NAME == "master" || env.BRANCH_NAME == "main" ) {
@@ -50,8 +52,6 @@ stages
 
           def versionOpts = ""
           def mvnOpts = ""
-          env.DO_TAG = false
-          env.SKIP_IT = false
 
           if(matcherRelease.matches()) {
               // Release branches
@@ -84,7 +84,7 @@ stages
               env.SKIP_IT = true
 
               versionOpts = "-Dbranch=" + env.BRANCH_NAME + " -Drevision=.b$BUILD_NUMBER -Dmodifier=-SNAPSHOT"
-              mvnOpts = "-Dmaven.site.skip -DskipITs"
+              mvnOpts = "-Dmaven.site.skip"
           } else {
               echo "OTHER BRANCH DETECTED"
               env.BRANCH_TYPE = "other"
