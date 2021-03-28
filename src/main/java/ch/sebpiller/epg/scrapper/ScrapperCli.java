@@ -36,7 +36,7 @@ import java.util.function.Function;
 )
 public final class ScrapperCli implements Callable<Integer> {
     public static final String ARTIFACT_ID = "epg-scrapper-cli";
-    static ScrapperCli scrapperCli;
+    static ScrapperCli scrapperCli; // test injection to test main method
 
     private final Function<Integer, Void> exitCodeListener;
 

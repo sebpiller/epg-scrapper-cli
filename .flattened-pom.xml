@@ -38,16 +38,18 @@
     <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
     <surefire.jacoco.args></surefire.jacoco.args>
     <skipUTs>false</skipUTs>
-    <branch>1.1</branch>
+    <branch>1.1.0</branch>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <failIfNoTests>true</failIfNoTests>
     <failsafe.jacoco.args></failsafe.jacoco.args>
-    <revision>0</revision>
+    <revision></revision>
     <maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
+    <feature></feature>
     <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
     <hibernate-validator.version>6.2.0.Final</hibernate-validator.version>
+    <skipITs>false</skipITs>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <jacoco.mincoverage>50%</jacoco.mincoverage>
+    <jacoco.mincoverage>30%</jacoco.mincoverage>
     <timestamp>${maven.build.timestamp}</timestamp>
   </properties>
   <dependencies>
@@ -216,7 +218,7 @@
               <configuration>
                 <rules>
                   <requireMavenVersion>
-                    <version>3.1.0</version>
+                    <version>3.6.0</version>
                   </requireMavenVersion>
                 </rules>
               </configuration>

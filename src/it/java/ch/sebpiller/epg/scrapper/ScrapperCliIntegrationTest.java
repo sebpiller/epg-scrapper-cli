@@ -2,11 +2,15 @@ package ch.sebpiller.epg.scrapper;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ScrapperCliTest {
+@DisplayName("ScrapperCli integration")
+@EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
+class ScrapperCliIntegrationTest {
     private ScrapperCli scrapperCli;
     private Integer exitCode;
 
@@ -24,18 +28,10 @@ class ScrapperCliTest {
         ScrapperCli.scrapperCli = scrapperCli;
     }
 
-    @Disabled("this test fails if maven did not package the file before. So this is an unstable test. ")
-    @Test
-    void test_version() {
-        assertThat(scrapperCli.getVersion())
-                .isNotEmpty()
-                .contains("built on");
-    }
-
+    @Disabled("this test takes way too much time to run")
     @Test
     void test_main() {
-        // bad call (no mandatory option specified) should lead to a different return code
-        ScrapperCli.main(new String[0]);
-        assertThat(exitCode).isNotZero();
+        ScrapperCli.main(new String[]{"--output", "target/epg.xml"});
+        assertThat(exitCode).isZero();
     }
 }
