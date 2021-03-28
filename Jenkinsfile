@@ -39,6 +39,7 @@ stages
           echo "Current branch: " + env.BRANCH_NAME
           env.DO_TAG = false
           env.SKIP_IT = false
+          env.DOCKER = false
 
           // Early abort if we run the pipeline on master.
           if( env.BRANCH_NAME == "master" || env.BRANCH_NAME == "main" ) {
@@ -58,6 +59,7 @@ stages
               echo "RELEASE BRANCH DETECTED!"
               env.BRANCH_TYPE = "release"
               env.DO_TAG = true
+              env.DOCKER = true
 
               env.RELEASE_VERSION = matcherRelease[0][1]
               versionOpts = "-Dbranch=" + env.RELEASE_VERSION + " -Dfeature= -Drevision=.b$BUILD_NUMBER -Dmodifier="
@@ -198,6 +200,23 @@ stages
              sh '''
                  mvn --batch-mode deploy -DskipUTs -DskipITs -Dmaven.site.skip ${MAVEN_ARGS}
              '''
+         }
+       }
+     }
+   }
+
+  stage('Docker Push')
+   {
+    steps
+     {
+      script
+       {
+         if ( env.DOCKER ) {
+             sh '''
+                 docker buildx build --platform linux/arm64,linux/arm/v7 --push -t sebpiller/epg-scrapper .
+             '''
+         } else {
+             echo "No docker push for this kind of branch: " + env.BRANCH_TYPE
          }
        }
      }
