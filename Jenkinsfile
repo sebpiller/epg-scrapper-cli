@@ -37,9 +37,9 @@ stages
       script
        {
           echo "Current branch: " + env.BRANCH_NAME
-          env.DO_TAG = false
-          env.SKIP_IT = false
-          env.BUILD_DOCKER = false
+          env.DO_TAG = "false"
+          env.SKIP_IT = "false"
+          env.BUILD_DOCKER = "false"
           env.DOCKER_TAG = "latest"
 
           // Early abort if we run the pipeline on master.
@@ -59,8 +59,8 @@ stages
               // Release branches
               echo "RELEASE BRANCH DETECTED!"
               env.BRANCH_TYPE = "release"
-              env.DO_TAG = true
-              env.BUILD_DOCKER = true
+              env.DO_TAG = "true"
+              env.BUILD_DOCKER = "true"
 
               env.RELEASE_VERSION = matcherRelease[0][1]
 
@@ -70,7 +70,7 @@ stages
               // Feature branches are tagged as snapshot of a particular name, with build number in it.
               echo "FEATURE BRANCH DETECTED!"
               env.BRANCH_TYPE = "feature"
-              env.DO_TAG = true
+              env.DO_TAG = "true"
 
               env.FEATURE_NAME = matcherFeature[0][1]
               versionOpts = "-Dbranch=FEAT -Dfeature=." + env.FEATURE_NAME + " -Drevision=.b$BUILD_NUMBER -Dmodifier=-SNAPSHOT"
@@ -86,7 +86,7 @@ stages
           } else if(env.BRANCH_NAME == "develop") {
               echo "DEVELOP BRANCH DETECTED"
               env.BRANCH_TYPE = "develop"
-              env.SKIP_IT = true
+              env.SKIP_IT = "true"
 
               versionOpts = "-Dbranch=" + env.BRANCH_NAME + " -Drevision=.b$BUILD_NUMBER -Dmodifier=-SNAPSHOT"
               mvnOpts = "-Dmaven.site.skip"
@@ -161,7 +161,10 @@ stages
     {
      script
       {
-        if ( !env.SKIP_IT ) {
+        echo env.SKIP_IT
+        if ( env.SKIP_IT == "true" ) {
+            echo "skipping ITs"
+        } else {
              sh '''
                  mvn --batch-mode verify -DskipUTs -Dmaven.site.skip ${MAVEN_ARGS}
              '''
@@ -177,7 +180,6 @@ stages
      {
       script
        {
-
          sh '''
              mvn --batch-mode site ${MAVEN_ARGS}
          '''
@@ -193,7 +195,8 @@ stages
      {
       script
        {
-         if ( env.DO_TAG ) {
+         if ( env.DO_TAG == "true" ) {
+             echo "Site and tag for this kind of branch: " + env.BRANCH_TYPE
              sh '''
                  mvn --batch-mode deploy scm:tag -DskipUTs -DskipITs ${MAVEN_ARGS}
              '''
@@ -214,9 +217,12 @@ stages
      {
       script
        {
-         if ( env.BUILD_DOCKER ) {
+         echo env.BUILD_DOCKER
+         echo env.DOCKER_TAG
+
+         if ( env.BUILD_DOCKER == "true" ) {
              sh '''
-                 docker buildx build --platform linux/arm64,linux/arm/v7 --push -t sebpiller/epg-scrapper:${DOCKER_TAG} .
+                docker buildx build --platform linux/arm64,linux/arm/v7 --push -t sebpiller/epg-scrapper:latest -t sebpiller/epg-scrapper:${DOCKER_TAG} .
              '''
          } else {
              echo "No docker push for this kind of branch: " + env.BRANCH_TYPE
