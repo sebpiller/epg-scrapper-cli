@@ -49,8 +49,9 @@ stages
           def matcherPr = env.BRANCH_NAME =~ /^(PR-.*)$/
 
           def versionOpts = ""
-          def docOpts = ""
+          def mvnOpts = ""
           env.DO_TAG = false
+          env.SKIP_IT = false
 
           if(matcherRelease.matches()) {
               // Release branches
@@ -80,6 +81,7 @@ stages
           } else if(env.BRANCH_NAME == "develop") {
               echo "DEVELOP BRANCH DETECTED"
               env.BRANCH_TYPE = "develop"
+              env.SKIP_IT = true
 
               versionOpts = "-Dbranch=" + env.BRANCH_NAME + " -Drevision=.b$BUILD_NUMBER -Dmodifier=-SNAPSHOT"
               mvnOpts = "-Dmaven.site.skip -DskipITs"
@@ -154,10 +156,12 @@ stages
     {
      script
       {
-         sh '''
-             mvn --batch-mode verify -DskipUTs -Dmaven.site.skip ${MAVEN_ARGS}
-         '''
-         junit testResults: 'target/failsafe-reports/*.xml'
+        if ( !env.SKIP_IT ) {
+             sh '''
+                 mvn --batch-mode verify -DskipUTs -Dmaven.site.skip ${MAVEN_ARGS}
+             '''
+             junit testResults: 'target/failsafe-reports/*.xml'
+         }
       }
     }
   }
