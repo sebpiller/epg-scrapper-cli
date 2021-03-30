@@ -23,6 +23,11 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/../jenkins-arm-docker/Jenkinsfile">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/../metronome/Jenkinsfile">
           <value>
             <set />
@@ -48,12 +53,97 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/../metronome/src/main/resources/metronome.version">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/../metronome/src/test/java/ch/sebpiller/metronome/MetronomeTest.java">
           <value>
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/../smart-lamp/Jenkinsfile">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../smart-lamp/beatdetect-bpmsource/pom.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../smart-lamp/beatdetect-bpmsource/src/main/resources/beatdetect-bpmsource.version">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../smart-lamp/beatdetect-bpmsource/src/main/resources/beatdetect.version">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../smart-lamp/bluetooth/pom.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../smart-lamp/bluetooth/src/it/java/ch/sebpiller/iot/bluetooth/bluez/BluetoothHelperIntegrationTest.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../smart-lamp/build-tools/pom.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../smart-lamp/build-tools/src/main/resources/checkstyle_custom.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../smart-lamp/luke-roberts-lamp-f-cli/pom.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../smart-lamp/luke-roberts-lamp-f-cli/src/main/resources/luke-roberts-lamp-f-cli.version">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../smart-lamp/luke-roberts-lamp-f/pom.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../smart-lamp/philips-hue-cli/pom.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../smart-lamp/philips-hue/pom.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/../smart-lamp/pom.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../smart-lamp/smart-lamp-amqp-web/pom.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../smart-lamp/smart-lamp-api/pom.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../smart-lamp/smart-lamp-sequencer/pom.xml">
           <value>
             <set />
           </value>
