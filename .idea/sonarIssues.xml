@@ -18,7 +18,22 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/src/it/java/ch/sebpiller/epg/scrapper/tsr/RtsEpgScrapperIntegrationTest.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/java/ch/sebpiller/epg/scrapper/tsr/RtsEpgScrapper.java">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/src/test/java/ch/sebpiller/epg/scrapper/ScrapperCliTest.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../jenkins-arm-docker/Dockerfile">
           <value>
             <set />
           </value>
@@ -144,6 +159,21 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/../smart-lamp/smart-lamp-sequencer/pom.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../steganographie/pom.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../steganographie/src/main/java/ch/sebpiller/stegano/impl/SteganoServiceImpl.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../steganographie/src/test/java/ch/sebpiller/stegano/impl/SteganoServiceImplParameterizedTest.java">
           <value>
             <set />
           </value>
