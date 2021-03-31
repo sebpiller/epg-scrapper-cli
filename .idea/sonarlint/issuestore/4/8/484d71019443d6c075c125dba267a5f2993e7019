@@ -1,0 +1,12 @@
+
+h
+java:S3776Q"RRefactor this method to reduce its Cognitive Complexity from 29 to the 15 allowed.(‡Ó…ê
+i
+java:S3776‰"RRefactor this method to reduce its Cognitive Complexity from 37 to the 15 allowed.(³Ì˜ó
+_
+java:S3457–"AFormat specifiers should be used instead of string concatenation.(‰ÍÌÄ8şÙºˆ/
+b
+java:S1134«"DTake the required action to fix the issue indicated by this comment.(š¦…†8ºëºˆ/
+{	java:S135"YReduce the total number of break and continue statements in this loop to use at most one.(³ô‰¦ûÿÿÿÿ8şÙºˆ/
+U
+java:S2629–"7Use the built-in formatting to construct this argument.(‰ÍÌÄ8şÙºˆ/
