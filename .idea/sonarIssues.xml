@@ -18,7 +18,22 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/src/it/java/ch/sebpiller/epg/scrapper/tsr/RtsEpgScrapperIntegrationTest.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/java/ch/sebpiller/epg/scrapper/tsr/RtsEpgScrapper.java">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/src/test/java/ch/sebpiller/epg/scrapper/ScrapperCliTest.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../jenkins-arm-docker/Dockerfile">
           <value>
             <set />
           </value>

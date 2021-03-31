@@ -6,6 +6,7 @@ import ch.sebpiller.epg.EpgInfo;
 import ch.sebpiller.epg.scrapper.EpgInfoScrappedListener;
 import ch.sebpiller.epg.scrapper.EpgScrapper;
 import ch.sebpiller.epg.scrapper.ScrappingException;
+import org.apache.commons.lang3.Validate;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -44,6 +45,7 @@ public class RtsEpgScrapper implements EpgScrapper {
      * The base url to scrape data from.
      */
     private static final String ROOT_URL = "https://hummingbird.rts.ch/hummingbird-ajax/programme-tv/schedules";
+
     /**
      * The uri to scrape details from.
      */
@@ -134,10 +136,8 @@ public class RtsEpgScrapper implements EpgScrapper {
      */
     void scrapeDocument(Document doc, Predicate<Channel> filterChannel, EpgInfoScrappedListener listener) {
         Elements epg = doc.select("section.schedules.day");
-        if (epg.size() != 1) {
-            throw new IllegalArgumentException("invalid document: no unique 'section' with classes " +
-                    "'schedules' and 'day' !");
-        }
+        Validate.isTrue(epg.size() == 1, "invalid document: no unique 'section' with classes " +
+                "'schedules' and 'day' !");
 
         for (Element elChannel : epg.get(0).children()) {
             LOG.trace("-------");
@@ -147,7 +147,8 @@ public class RtsEpgScrapper implements EpgScrapper {
             String channelName = cn.iterator().next();
             Channel channel = Channel.valueOfAliases(channelName);
             if (channel == null) {
-                throw new IllegalArgumentException("unknown channel: " + channelName);
+                LOG.warn("we've found an unknown channel parsing RTS: " + channelName);
+                continue;
             }
             if (!filterChannel.test(channel)) {
                 continue;
