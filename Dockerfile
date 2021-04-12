@@ -14,6 +14,6 @@ RUN \
 
     rm -rf /var/lib/apt/lists/*
 
-COPY target/epg-scrapper-*-jar-with-dependencies.jar /epg-scrapper-latest.jar
+COPY target/epg-scrapper-*-sb-executable.jar /epg-scrapper-latest.jar
 
 CMD [ "/bin/sh", "-c", "java -jar /epg-scrapper-latest.jar -o /data/epg.xml" ]
