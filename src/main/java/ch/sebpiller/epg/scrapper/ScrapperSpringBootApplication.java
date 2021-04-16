@@ -7,6 +7,7 @@ import picocli.CommandLine;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Properties;
 
 @SpringBootApplication
@@ -47,6 +48,20 @@ public class ScrapperSpringBootApplication {
     }
 
     public static void main(String[] args) {
-        System.exit(SpringApplication.exit(SpringApplication.run(ScrapperSpringBootApplication.class, args)));
+        SpringApplication app = new SpringApplication(ScrapperSpringBootApplication.class);
+        app.setBanner((environment, sourceClass, out) -> {
+
+            out.println(".::::::::.:::::::     .::::          .:: ::     .::   .:::::::          .:       .:::::::  .:::::::  .::::::::.:::::::    ");
+            out.println(".::      .::    .:: .:    .::      .::    .::.::   .::.::    .::       .: ::     .::    .::.::    .::.::      .::    .::  ");
+            out.println(".::      .::    .::.::              .::     .::       .::    .::      .:  .::    .::    .::.::    .::.::      .::    .::  ");
+            out.println(".::::::  .:::::::  .::                .::   .::       .: .::         .::   .::   .:::::::  .:::::::  .::::::  .: .::      ");
+            out.println(".::      .::       .::   .::::           .::.::       .::  .::      .:::::: .::  .::       .::       .::      .::  .::    ");
+            out.println(".::      .::        .::    .:      .::    .::.::   .::.::    .::   .::       .:: .::       .::       .::      .::    .::  ");
+            out.println(".::::::::.::         .:::::          .:: ::    .::::  .::      .::.::         .::.::       .::       .::::::::.::      .::");
+            out.println("                                                                                                                          ");
+            out.println();
+            out.println(Arrays.toString(new VersionProvider().getVersion()));
+        });
+        System.exit(SpringApplication.exit(app.run(args)));
     }
 }
