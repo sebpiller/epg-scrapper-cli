@@ -80,7 +80,7 @@ class EpgInfosToEpgGuideTest {
     }
 
     @Test
-    void exportUsingSax() {
+    void exportUsingSax() throws Exception {
         i = 0;
 
         // Fake scrappers using a List<EpgInfo> as source
@@ -104,10 +104,6 @@ class EpgInfosToEpgGuideTest {
 
                 return xmlProducer.epgInfoScrapped(x);
             }));
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
     }
 
