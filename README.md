@@ -1,10 +1,10 @@
-# EPG-Scrapper
+# epg-scrapper-cli
 
-Tool to build an XMLTV file containing EPG (Electronic Program Guide) with infos found in various sources:
+Tool to build an XMLTV file containing EPG (Electronic Program Guide) with infos retrieved from various sources:
 
 - https://hummingbird.rts.ch/hummingbird-ajax/programme-tv/schedules
 - https://grille.ocs.fr
-- https://playtv.fr/programmes-tv
+- https://tv.search.ch
 - https://www.programme-tv.net/programme
 
 Actually, the scrapping process scrapes all the available information from all sources for ~70 FR-CH channels (about 32'000 entries) in a bit less than 45 minutes (with a RPi4).

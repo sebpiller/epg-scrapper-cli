@@ -1,4 +1,4 @@
-version=${project.version}
-timestamp=${timestamp}
 group=${project.groupId}
 artifact=${project.artifactId}
+version=${project.version}
+timestamp=${timestamp}

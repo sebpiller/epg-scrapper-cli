@@ -26,16 +26,6 @@ class RtsEpgScrapperIntegrationTest extends IntegrationTest {
     private static final Logger LOG = LoggerFactory.getLogger(RtsEpgScrapperIntegrationTest.class);
 
     @Test
-    void displayScheduleFromRts() throws IOException {
-        LOG.debug("\n{}", Jsoup.connect("https://hummingbird.rts.ch/hummingbird-ajax/programme-tv/schedules?dayStr=2021-01-07&limit=6&offset=0&filter=none").get());
-    }
-
-    @Test
-    void displayScheduleDetailFromRts() throws IOException {
-        LOG.debug("\n{}", Jsoup.connect("https://hummingbird.rts.ch/hummingbird-ajax/programme-tv/medias/imedia-243919772").get());
-    }
-
-    @Test
     void testScrapeFromRts() throws IOException {
         List<EpgInfo> allInfos = new ArrayList<>(25_000);
         final ZonedDateTime inAWeek = ZonedDateTime.now().plus(7, ChronoUnit.DAYS);
