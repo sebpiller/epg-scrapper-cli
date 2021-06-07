@@ -120,7 +120,7 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
         LocalTime lastTime = null;
         LocalDate ld = date;
 
-        String text = doc.select(".gridChannel-epgGrid .gridChannel-title").text();
+        String text = doc.select(".gridChannel .gridChannel-title").text();
         Channel c = Channel.valueOfAliases(text);
         if (c == null) {
             throw new ScrappingException("can not find channel " + text);

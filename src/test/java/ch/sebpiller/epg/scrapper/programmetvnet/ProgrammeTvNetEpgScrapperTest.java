@@ -38,7 +38,7 @@ class ProgrammeTvNetEpgScrapperTest {
             return true;
         });
 
-        assertThat(this.i).isEqualTo(56);
+        assertThat(this.i).isEqualTo(60);
     }
 
     @Test
