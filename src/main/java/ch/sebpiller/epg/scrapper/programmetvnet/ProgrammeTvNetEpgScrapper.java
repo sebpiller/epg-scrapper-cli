@@ -5,6 +5,7 @@ import ch.sebpiller.epg.EpgInfo;
 import ch.sebpiller.epg.scrapper.EpgInfoScrappedListener;
 import ch.sebpiller.epg.scrapper.EpgScrapper;
 import ch.sebpiller.epg.scrapper.ScrappingException;
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -86,7 +87,8 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
                     // fetch data for current channel
                     String url = ROOT_URL + '/' + DAYSTR_FORMAT.format(dayFetch) + '/' + c.getValue() + ".html";
                     doc = Jsoup.connect(url).get();
-                    scrapeDocument(doc, listener);
+
+                    scrapeDocument(doc, c.getKey(), listener);
                     dayFetch = dayFetch.plusDays(1); // tomorrow
                 } catch (HttpStatusException e) {
                     if (e.getStatusCode() == 404) {
@@ -106,7 +108,7 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
         LOG.info("scrapper {} has completed", this);
     }
 
-    void scrapeDocument(Document doc, EpgInfoScrappedListener listener) {
+    void scrapeDocument(Document doc, Channel c, EpgInfoScrappedListener listener) {
         // https://www.programme-tv.net/programme/chaine/2021-01-14/programme-mangas-82.html
         String uri = doc.getElementsByAttributeValue("rel", "canonical").attr("href");
         Matcher m = Pattern.compile("^.*/(\\d{4}-\\d{2}-\\d{2})/.*$").matcher(uri);
@@ -120,16 +122,16 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
         LocalTime lastTime = null;
         LocalDate ld = date;
 
-        String text = doc.select(".gridChannel .gridChannel-title").text();
+       /* String text = doc.select(".gridChannel .gridChannel-title").text();
         Channel c = Channel.valueOfAliases(text);
         if (c == null) {
             throw new ScrappingException("can not find channel " + text);
-        }
+        }*/
 
-        for (Element a : doc.getElementsByClass("singleBroadcastCard")) {
+        for (Element a : doc.getElementsByClass("mainBroadcastCard")) {
             EpgInfo info = new EpgInfo(c);
 
-            String from = a.selectFirst(".singleBroadcastCard-hour").text();
+            String from = a.selectFirst(".mainBroadcastCard-startingHour").text();
             String[] split = from.split("h");
             LocalTime time = LocalTime.of(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
 
@@ -140,15 +142,22 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
 
             ZonedDateTime zdt = ZonedDateTime.of(ld, time, ZoneId.of("Europe/Zurich"));
             info.setTimeStart(zdt);
-            Element title = a.selectFirst(".singleBroadcastCard-title");
+            Element title = a.selectFirst(".mainBroadcastCard-title a");
             info.setTitle(title.text());
-            info.setSubtitle(a.selectFirst(".singleBroadcastCard-subtitle").text());
+            Element element = a.selectFirst(".mainBroadcastCard-subtitle");
+            if (element == null)
+                LOG.warn("no subtitle found for {}", title.text());
+            else {
+                info.setSubtitle(element.text());
+            }
+            info.setCategory(resolveCategory(a.selectFirst(".mainBroadcastCard-genre").text()));
 
-            info.setCategory(resolveCategory(a.selectFirst(".singleBroadcastCard-genre").text()));
-
-            parseDetails(title.attr("href"), info);
-
-
+            String href = title.attr("href");
+            if (StringUtils.isBlank(href))
+                LOG.warn("no details uri found for {}", title.text());
+            else {
+                parseDetails(href, info);
+            }
             this.lastEpgs.computeIfPresent(c, (channel, epgInfo) -> {
                 epgInfo.setTimeStop(zdt);
                 if (!listener.epgInfoScrapped(epgInfo)) {
@@ -177,6 +186,8 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
             throw new ScrappingException(e);
         } catch (IOException e) {
             throw new ScrappingException(e);
+        } catch (IllegalArgumentException iae) {
+            System.out.println("URI = " + uri);
         }
     }
 
