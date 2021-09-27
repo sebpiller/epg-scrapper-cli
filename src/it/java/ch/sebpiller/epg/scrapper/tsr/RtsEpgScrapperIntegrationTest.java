@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @DisplayName("RTS Scrapper integration")
-@EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
+//@EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
 class RtsEpgScrapperIntegrationTest extends IntegrationTest {
     private static final Logger LOG = LoggerFactory.getLogger(RtsEpgScrapperIntegrationTest.class);
 

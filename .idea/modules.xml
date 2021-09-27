@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/epg-scrapper-cli.iml" filepath="$PROJECT_DIR$/epg-scrapper-cli.iml" />
+      <module fileurl="file://$PROJECT_DIR$/epg-scrapper-cli (1).iml" filepath="$PROJECT_DIR$/epg-scrapper-cli (1).iml" />
     </modules>
   </component>
 </project>

@@ -31,14 +31,14 @@ class ProgrammeTvNetEpgScrapperTest {
         };
 
         // do not scrape details
-        scrapper.scrapeDocument(doc, e -> {
+        scrapper.scrapeDocument(doc, Channel.MANGAS, e -> {
             this.i++;
             LOG.info("{}", e);
 
             return true;
         });
 
-        assertThat(this.i).isEqualTo(56);
+        assertThat(this.i).isEqualTo(59);
     }
 
     @Test

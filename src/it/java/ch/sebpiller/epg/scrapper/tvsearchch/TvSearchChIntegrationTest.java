@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @DisplayName("TvSearch CH Scrapper integration")
-@EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
+//@EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
 class TvSearchChIntegrationTest extends IntegrationTest {
     private TvSearchCh test;
 

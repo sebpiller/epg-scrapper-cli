@@ -5,6 +5,7 @@ import ch.sebpiller.epg.EpgInfo;
 import ch.sebpiller.epg.scrapper.EpgInfoScrappedListener;
 import ch.sebpiller.epg.scrapper.EpgScrapper;
 import ch.sebpiller.epg.scrapper.ScrappingException;
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -13,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -45,23 +47,23 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
     static {
         Map<Channel, String> x = new EnumMap<>(Channel.class);
         x.put(Channel.MANGAS, "programme-mangas-82");
-        x.put(Channel.THIRTEENTH_STREET, "programme-13eme-rue-26");
+        //x.put(Channel.THIRTEENTH_STREET, "programme-13eme-rue-26");
         // TODO
         x.put(Channel.TF1_SERIES_FILMS, "programme-tf1-series-films-201");
         x.put(Channel.SYFY, "programme-syfy-110");
-        x.put(Channel.CANALPLUS, "programme-canalplus-2");
+        //x.put(Channel.CANALPLUS, "programme-canalplus-2");
         x.put(Channel.AB3, "programme-ab-3-138");
         x.put(Channel.NATGEO, "programme-national-geographic-98");
         x.put(Channel.NATGEOWILD, "programme-nat-geo-wild-207");
-        x.put(Channel.LCI, "programme-lci-la-chaine-info-78");
+        //x.put(Channel.LCI, "programme-lci-la-chaine-info-78");
         x.put(Channel.DISNEY_CHANNEL, "programme-disney-channel-57");
         x.put(Channel.DISNEY_JUNIOR, "programme-disney-junior-166");
-        x.put(Channel.VOYAGE, "programme-voyage-134");
-        x.put(Channel.USHUAIA, "programme-ushuaia-tv-132");
+        //x.put(Channel.VOYAGE, "programme-voyage-134");
+        //x.put(Channel.USHUAIA, "programme-ushuaia-tv-132");
         x.put(Channel.PARAMOUNT, "programme-paramount-channel-226");
-        x.put(Channel.FRANCE24, "programme-france-24-142");
-        x.put(Channel.EQUIDIA, "programme-equidia-59");
-        x.put(Channel.CHASSE_PECHE, "programme-chasse-et-peche-42");
+        //x.put(Channel.FRANCE24, "programme-france-24-142");
+        //x.put(Channel.EQUIDIA, "programme-equidia-59");
+        //x.put(Channel.CHASSE_PECHE, "programme-chasse-et-peche-42");
         //x.put(Channel.RMCDECOUVERTE, "programme-rmc-decouverte-205");
 
         MAP = Collections.unmodifiableMap(x);
@@ -86,7 +88,8 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
                     // fetch data for current channel
                     String url = ROOT_URL + '/' + DAYSTR_FORMAT.format(dayFetch) + '/' + c.getValue() + ".html";
                     doc = Jsoup.connect(url).get();
-                    scrapeDocument(doc, listener);
+
+                    scrapeDocument(doc, c.getKey(), listener);
                     dayFetch = dayFetch.plusDays(1); // tomorrow
                 } catch (HttpStatusException e) {
                     if (e.getStatusCode() == 404) {
@@ -106,7 +109,7 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
         LOG.info("scrapper {} has completed", this);
     }
 
-    void scrapeDocument(Document doc, EpgInfoScrappedListener listener) {
+    void scrapeDocument(Document doc, Channel c, EpgInfoScrappedListener listener) {
         // https://www.programme-tv.net/programme/chaine/2021-01-14/programme-mangas-82.html
         String uri = doc.getElementsByAttributeValue("rel", "canonical").attr("href");
         Matcher m = Pattern.compile("^.*/(\\d{4}-\\d{2}-\\d{2})/.*$").matcher(uri);
@@ -120,16 +123,16 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
         LocalTime lastTime = null;
         LocalDate ld = date;
 
-        String text = doc.select(".gridChannel-epgGrid .gridChannel-title").text();
+       /* String text = doc.select(".gridChannel .gridChannel-title").text();
         Channel c = Channel.valueOfAliases(text);
         if (c == null) {
             throw new ScrappingException("can not find channel " + text);
-        }
+        }*/
 
-        for (Element a : doc.getElementsByClass("singleBroadcastCard")) {
+        for (Element a : doc.getElementsByClass("mainBroadcastCard")) {
             EpgInfo info = new EpgInfo(c);
 
-            String from = a.selectFirst(".singleBroadcastCard-hour").text();
+            String from = a.selectFirst(".mainBroadcastCard-startingHour").text();
             String[] split = from.split("h");
             LocalTime time = LocalTime.of(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
 
@@ -140,15 +143,22 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
 
             ZonedDateTime zdt = ZonedDateTime.of(ld, time, ZoneId.of("Europe/Zurich"));
             info.setTimeStart(zdt);
-            Element title = a.selectFirst(".singleBroadcastCard-title");
+            Element title = a.selectFirst(".mainBroadcastCard-title a");
             info.setTitle(title.text());
-            info.setSubtitle(a.selectFirst(".singleBroadcastCard-subtitle").text());
+            Element element = a.selectFirst(".mainBroadcastCard-subtitle");
+            if (element == null)
+                LOG.warn("no subtitle found for {}", title.text());
+            else {
+                info.setSubtitle(element.text());
+            }
+            info.setCategory(resolveCategory(a.selectFirst(".mainBroadcastCard-genre").text()));
 
-            info.setCategory(resolveCategory(a.selectFirst(".singleBroadcastCard-genre").text()));
-
-            parseDetails(title.attr("href"), info);
-
-
+            String href = title.attr("href");
+            if (StringUtils.isBlank(href))
+                LOG.warn("no details uri found for {}", title.text());
+            else {
+                parseDetails(href, info);
+            }
             this.lastEpgs.computeIfPresent(c, (channel, epgInfo) -> {
                 epgInfo.setTimeStop(zdt);
                 if (!listener.epgInfoScrapped(epgInfo)) {
@@ -175,8 +185,12 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
             }
 
             throw new ScrappingException(e);
+        } catch(SocketTimeoutException e) {
+            e.printStackTrace();
         } catch (IOException e) {
             throw new ScrappingException(e);
+        } catch (IllegalArgumentException iae) {
+            System.out.println("URI = " + uri);
         }
     }
 
