@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @DisplayName("ProgrammeTV Net Scrapper integration")
-@EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
+//@EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
 class ProgrammeTvNetEpgScrapperIntegrationTest extends IntegrationTest {
     private static final Logger LOG = LoggerFactory.getLogger(ProgrammeTvNetEpgScrapperIntegrationTest.class);
 

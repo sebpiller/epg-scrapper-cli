@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @DisplayName("OCS Scrapper integration")
-@EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
+// @EnabledIfEnvironmentVariable(named = "HOSTNAME", matches = "jenkins.*")
 class OcsEpgScrapperIntegrationTest {
     private static final Logger LOG = LoggerFactory.getLogger(OcsEpgScrapperIntegrationTest.class);
 

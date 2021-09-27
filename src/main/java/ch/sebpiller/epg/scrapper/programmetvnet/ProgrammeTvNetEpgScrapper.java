@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -46,23 +47,23 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
     static {
         Map<Channel, String> x = new EnumMap<>(Channel.class);
         x.put(Channel.MANGAS, "programme-mangas-82");
-        x.put(Channel.THIRTEENTH_STREET, "programme-13eme-rue-26");
+        //x.put(Channel.THIRTEENTH_STREET, "programme-13eme-rue-26");
         // TODO
         x.put(Channel.TF1_SERIES_FILMS, "programme-tf1-series-films-201");
         x.put(Channel.SYFY, "programme-syfy-110");
-        x.put(Channel.CANALPLUS, "programme-canalplus-2");
+        //x.put(Channel.CANALPLUS, "programme-canalplus-2");
         x.put(Channel.AB3, "programme-ab-3-138");
         x.put(Channel.NATGEO, "programme-national-geographic-98");
         x.put(Channel.NATGEOWILD, "programme-nat-geo-wild-207");
-        x.put(Channel.LCI, "programme-lci-la-chaine-info-78");
+        //x.put(Channel.LCI, "programme-lci-la-chaine-info-78");
         x.put(Channel.DISNEY_CHANNEL, "programme-disney-channel-57");
         x.put(Channel.DISNEY_JUNIOR, "programme-disney-junior-166");
-        x.put(Channel.VOYAGE, "programme-voyage-134");
-        x.put(Channel.USHUAIA, "programme-ushuaia-tv-132");
+        //x.put(Channel.VOYAGE, "programme-voyage-134");
+        //x.put(Channel.USHUAIA, "programme-ushuaia-tv-132");
         x.put(Channel.PARAMOUNT, "programme-paramount-channel-226");
-        x.put(Channel.FRANCE24, "programme-france-24-142");
-        x.put(Channel.EQUIDIA, "programme-equidia-59");
-        x.put(Channel.CHASSE_PECHE, "programme-chasse-et-peche-42");
+        //x.put(Channel.FRANCE24, "programme-france-24-142");
+        //x.put(Channel.EQUIDIA, "programme-equidia-59");
+        //x.put(Channel.CHASSE_PECHE, "programme-chasse-et-peche-42");
         //x.put(Channel.RMCDECOUVERTE, "programme-rmc-decouverte-205");
 
         MAP = Collections.unmodifiableMap(x);
@@ -184,6 +185,8 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
             }
 
             throw new ScrappingException(e);
+        } catch(SocketTimeoutException e) {
+            e.printStackTrace();
         } catch (IOException e) {
             throw new ScrappingException(e);
         } catch (IllegalArgumentException iae) {

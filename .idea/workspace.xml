@@ -5,7 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1eeb3c56-9922-479c-99d5-f6ba68dd8845" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/epg-scrapper-cli (1).iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/epg-scrapper-cli (2).iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/it/java/ch/sebpiller/epg/scrapper/IntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/it/java/ch/sebpiller/epg/scrapper/IntegrationTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/it/java/ch/sebpiller/epg/scrapper/ocs/OcsEpgScrapperIntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/it/java/ch/sebpiller/epg/scrapper/ocs/OcsEpgScrapperIntegrationTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/it/java/ch/sebpiller/epg/scrapper/programmetvnet/ProgrammeTvNetEpgScrapperIntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/it/java/ch/sebpiller/epg/scrapper/programmetvnet/ProgrammeTvNetEpgScrapperIntegrationTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/it/java/ch/sebpiller/epg/scrapper/tsr/RtsEpgScrapperIntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/it/java/ch/sebpiller/epg/scrapper/tsr/RtsEpgScrapperIntegrationTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/it/java/ch/sebpiller/epg/scrapper/tvsearchch/TvSearchChIntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/it/java/ch/sebpiller/epg/scrapper/tvsearchch/TvSearchChIntegrationTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ch/sebpiller/epg/scrapper/programmetvnet/ProgrammeTvNetEpgScrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/sebpiller/epg/scrapper/programmetvnet/ProgrammeTvNetEpgScrapper.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -35,11 +43,17 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="ExpandSpringBootJavaOptionsPanel" value="true" />
+    <property name="RequestMappingsPanelOrder0" value="0" />
+    <property name="RequestMappingsPanelOrder1" value="1" />
+    <property name="RequestMappingsPanelWidth0" value="75" />
+    <property name="RequestMappingsPanelWidth1" value="75" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../jenkins-server-arm-docker" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="project.structure.last.edited" value="SDKs" />
     <property name="project.structure.proportion" value="0.0" />
@@ -52,7 +66,7 @@
       </set>
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.ProgrammeTvNetEpgScrapperIntegrationTest.testScrapeFromProgrammeTvNet (1)">
+  <component name="RunManager" selected="Spring Boot.ScrapperSpringBootApplication">
     <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
       <option name="arquillianRunConfiguration">
         <value>
@@ -95,37 +109,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="ProgrammeTvNetEpgScrapperIntegrationTest.testScrapeFromProgrammeTvNet" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="epg-scrapper-cli" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="ch.sebpiller.epg.scrapper.programmetvnet.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="ch.sebpiller.epg.scrapper.programmetvnet" />
-      <option name="MAIN_CLASS_NAME" value="ch.sebpiller.epg.scrapper.programmetvnet.ProgrammeTvNetEpgScrapperIntegrationTest" />
-      <option name="METHOD_NAME" value="testScrapeFromProgrammeTvNet" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="ProgrammeTvNetEpgScrapperTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="epg-scrapper-cli (1)" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="ch.sebpiller.epg.scrapper.programmetvnet.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="ch.sebpiller.epg.scrapper.programmetvnet" />
-      <option name="MAIN_CLASS_NAME" value="ch.sebpiller.epg.scrapper.programmetvnet.ProgrammeTvNetEpgScrapperTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="ProgrammeTvNetEpgScrapperTest.testScrapeFromLocal" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="epg-scrapper-cli (1)" />
       <extension name="coverage">
@@ -138,6 +121,22 @@
       <option name="MAIN_CLASS_NAME" value="ch.sebpiller.epg.scrapper.programmetvnet.ProgrammeTvNetEpgScrapperTest" />
       <option name="METHOD_NAME" value="testScrapeFromLocal" />
       <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="java in epg-scrapper-cli (1)" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="epg-scrapper-cli (1)" />
+      <option name="TEST_OBJECT" value="directory" />
+      <dir value="$PROJECT_DIR$/src/test/java" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="java in epg-scrapper-cli (2)" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="epg-scrapper-cli (1)" />
+      <option name="TEST_OBJECT" value="directory" />
+      <dir value="$PROJECT_DIR$/src/it/java" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -156,13 +155,33 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="ScrapperSpringBootApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="epg-scrapper-cli (1)" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="ch.sebpiller.epg.scrapper.ScrapperSpringBootApplication" />
+      <option name="PROGRAM_PARAMETERS" value="-o epg.xml" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="SHORTEN_COMMAND_LINE" value="NONE" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="JUnit.ProgrammeTvNetEpgScrapperIntegrationTest" />
+      <item itemvalue="JUnit.ProgrammeTvNetEpgScrapperIntegrationTest.testScrapeFromProgrammeTvNet (1)" />
+      <item itemvalue="JUnit.ProgrammeTvNetEpgScrapperTest.testScrapeFromLocal" />
+      <item itemvalue="JUnit.java in epg-scrapper-cli (1)" />
+      <item itemvalue="JUnit.java in epg-scrapper-cli (2)" />
+      <item itemvalue="Spring Boot.ScrapperSpringBootApplication (1)" />
+      <item itemvalue="Spring Boot.ScrapperSpringBootApplication (2)" />
+      <item itemvalue="Spring Boot.ScrapperSpringBootApplication" />
+    </list>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.java in epg-scrapper-cli (2)" />
+        <item itemvalue="JUnit.java in epg-scrapper-cli (1)" />
+        <item itemvalue="JUnit.ProgrammeTvNetEpgScrapperTest.testScrapeFromLocal" />
         <item itemvalue="JUnit.ProgrammeTvNetEpgScrapperIntegrationTest.testScrapeFromProgrammeTvNet (1)" />
         <item itemvalue="JUnit.ProgrammeTvNetEpgScrapperIntegrationTest" />
-        <item itemvalue="JUnit.ProgrammeTvNetEpgScrapperTest.testScrapeFromLocal" />
-        <item itemvalue="JUnit.ProgrammeTvNetEpgScrapperTest" />
-        <item itemvalue="JUnit.ProgrammeTvNetEpgScrapperIntegrationTest.testScrapeFromProgrammeTvNet" />
       </list>
     </recent_temporary>
   </component>
@@ -180,7 +199,10 @@
       <workItem from="1623329002423" duration="206000" />
       <workItem from="1625694602421" duration="1478000" />
       <workItem from="1625763390596" duration="2964000" />
-      <workItem from="1625766797233" duration="303000" />
+      <workItem from="1625766797233" duration="1159000" />
+      <workItem from="1631448738285" duration="3764000" />
+      <workItem from="1632166976736" duration="132000" />
+      <workItem from="1632613549256" duration="1868000" />
     </task>
     <servers />
   </component>
@@ -199,6 +221,9 @@
     </option>
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
@@ -206,11 +231,6 @@
           <url>file://$PROJECT_DIR$/src/main/java/ch/sebpiller/epg/scrapper/ScrapperCommand.java</url>
           <line>39</line>
           <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/ch/sebpiller/epg/scrapper/programmetvnet/ProgrammeTvNetEpgScrapper.java</url>
-          <line>150</line>
-          <option name="timeStamp" value="4" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
