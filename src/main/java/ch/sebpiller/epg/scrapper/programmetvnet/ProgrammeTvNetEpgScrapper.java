@@ -115,7 +115,8 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
         Matcher m = Pattern.compile("^.*/(\\d{4}-\\d{2}-\\d{2})/.*$").matcher(uri);
 
         if (!m.matches()) {
-            throw new ScrappingException("can not find date of document");
+            return;
+            //throw new ScrappingException("can not find date of document");
         }
 
         LocalDate date = LocalDate.from(DAYSTR_FORMAT.parse(m.group(1)));

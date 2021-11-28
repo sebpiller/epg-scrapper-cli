@@ -12,6 +12,7 @@ import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.slf4j.LoggerFactory
 import java.io.IOException
+import java.net.SocketTimeoutException
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
@@ -101,6 +102,8 @@ open class OcsEpgScrapper : EpgScrapper {
     open fun parseDetails(uri: String, info: EpgInfo) {
         try {
             parseDetails(Jsoup.connect(uri).get(), info)
+        } catch (e: SocketTimeoutException) {
+            LOG.warn("timeout {}", uri, e)
         } catch (e: HttpStatusException) {
             // ignore 403 errors
             if (e.statusCode == 403) {

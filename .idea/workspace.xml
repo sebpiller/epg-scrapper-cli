@@ -4,10 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1eeb3c56-9922-479c-99d5-f6ba68dd8845" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/jenkinsSettings.xml" afterDir="false" />
+    <list default="true" id="4a5739ff-1718-46ba-a0ce-10611a167989" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/ch/sebpiller/epg/producer/EpgInfosToEpgGuideTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/ch/sebpiller/epg/producer/EpgInfosToEpgGuideTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,6 +44,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../TheK8sBook" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="preferences.Jenkins" />
   </component>
@@ -153,11 +152,19 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <list>
+      <item itemvalue="JUnit.ScrapperSpringBootApplicationTest" />
+      <item itemvalue="JUnit.ScrapperSpringBootApplicationTest.test_main" />
+      <item itemvalue="JUnit.ScrapperSpringBootApplicationTest.test_main_ko" />
+      <item itemvalue="JUnit.ScrapperSpringBootApplicationTest.test_main_ok" />
+      <item itemvalue="Spring Boot.ScrapperSpringBootApplication (1)" />
+      <item itemvalue="Spring Boot.ScrapperSpringBootApplication" />
+    </list>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.ScrapperSpringBootApplicationTest.test_main_ko" />
-        <item itemvalue="JUnit.ScrapperSpringBootApplicationTest.test_main_ok" />
         <item itemvalue="Spring Boot.ScrapperSpringBootApplication" />
+        <item itemvalue="JUnit.ScrapperSpringBootApplicationTest.test_main_ok" />
+        <item itemvalue="JUnit.ScrapperSpringBootApplicationTest.test_main_ko" />
         <item itemvalue="JUnit.ScrapperSpringBootApplicationTest.test_main" />
         <item itemvalue="JUnit.ScrapperSpringBootApplicationTest" />
       </list>
@@ -166,7 +173,7 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="1eeb3c56-9922-479c-99d5-f6ba68dd8845" name="Default Changelist" comment="" />
+      <changelist id="4a5739ff-1718-46ba-a0ce-10611a167989" name="Changes" comment="" />
       <created>1618242785146</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
@@ -181,6 +188,9 @@
       <workItem from="1618757663540" duration="1297000" />
       <workItem from="1618759000806" duration="1823000" />
       <workItem from="1618816016045" duration="943000" />
+      <workItem from="1632781069887" duration="1195000" />
+      <workItem from="1632849749316" duration="632000" />
+      <workItem from="1632851856525" duration="1210000" />
     </task>
     <servers />
   </component>
