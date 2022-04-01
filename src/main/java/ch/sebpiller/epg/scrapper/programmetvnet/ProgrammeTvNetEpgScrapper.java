@@ -85,7 +85,7 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
 
             do {
                 try {
-                    // fetch data for current channel
+                    // fetch data for current channeil
                     String url = ROOT_URL + '/' + DAYSTR_FORMAT.format(dayFetch) + '/' + c.getValue() + ".html";
                     doc = Jsoup.connect(url).get();
 
@@ -152,7 +152,7 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
             else {
                 info.setSubtitle(element.text());
             }
-            info.setCategory(resolveCategory(a.selectFirst(".mainBroadcastCard-genre").text()));
+            info.setCategory(resolveCategory(a.selectFirst(".mainBroadcastCard-format").text()));
 
             String href = title.attr("href");
             if (StringUtils.isBlank(href))
@@ -221,7 +221,7 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
 
     private String resolveCategory(String text) {
         // FIXME improve mapping of category between rts and xmltv
-        switch (text.toLowerCase()) {
+        switch (text.toLowerCase().trim()) {
             case "film":
             case "téléfilm":
             case "film tv":
@@ -234,7 +234,7 @@ public class ProgrammeTvNetEpgScrapper implements EpgScrapper {
             case "sport":
             case "sports":
                 return "Sports";
-            case "xxxxx":
+            case "jeunesse":
                 return "Children's / Youth";
             case "xxx":
                 return "Music";
